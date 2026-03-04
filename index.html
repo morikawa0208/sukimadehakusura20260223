@@ -159,6 +159,59 @@ const STAGES = [
     { id: 10, name: '白の尖塔' }
 ];
 
+const BOSS_DEFINITIONS = {
+    1: { id: 'boss_stage_1', name: '翠牙狼王ヴェルド', icon: 'fa-paw', base: { hp: 140, str: 14, vit: 7 }, tags: ['forest'], skills: [
+        { id: 'b1_howl', name: '狩人の咆哮', type: 'buffSelf', turns: 2, atkMult: 1.35, cooldown: 3, icon: 'fa-bullhorn' },
+        { id: 'b1_bind', name: '蔦縛り', type: 'statusAttack', damageMult: 1.1, statusId: 'seal', turns: 1, chance: 70, cooldown: 2, icon: 'fa-link' },
+        { id: 'b1_blessing', name: '森の加護', type: 'heal', healRate: 0.18, triggerHpRate: 0.45, once: true, icon: 'fa-leaf' }
+    ] },
+    2: { id: 'boss_stage_2', name: '反響魔コーラルバット', icon: 'fa-bat', base: { hp: 150, str: 15, vit: 8 }, tags: ['cave'], skills: [
+        { id: 'b2_echo', name: '反響咆哮', type: 'buffSelf', turns: 2, atkMult: 1.3, cooldown: 3, icon: 'fa-volume-high' },
+        { id: 'b2_sonic', name: '超音波', type: 'statusAttack', damageMult: 1.0, statusId: 'attackCountDown', turns: 2, chance: 65, cooldown: 2, icon: 'fa-volume-xmark' },
+        { id: 'b2_night', name: '闇夜の再生', type: 'heal', healRate: 0.16, triggerHpRate: 0.45, once: true, icon: 'fa-moon' }
+    ] },
+    3: { id: 'boss_stage_3', name: '廃都執行者ネメシス', icon: 'fa-skull', base: { hp: 165, str: 16, vit: 9 }, tags: ['ruins'], skills: [
+        { id: 'b3_justice', name: '執行宣言', type: 'buffSelf', turns: 2, atkMult: 1.35, cooldown: 3, icon: 'fa-gavel' },
+        { id: 'b3_chain', name: '断罪の鎖', type: 'statusAttack', damageMult: 1.15, statusId: 'seal', turns: 1, chance: 70, cooldown: 2, icon: 'fa-link' },
+        { id: 'b3_ruin', name: '廃都の残響', type: 'heal', healRate: 0.17, triggerHpRate: 0.45, once: true, icon: 'fa-city' }
+    ] },
+    4: { id: 'boss_stage_4', name: '熔鉄竜イグニバルド', icon: 'fa-dragon', base: { hp: 180, str: 18, vit: 10 }, tags: ['fire'], skills: [
+        { id: 'b4_heat', name: '灼熱鱗', type: 'buffSelf', turns: 2, atkMult: 1.4, cooldown: 3, icon: 'fa-fire-flame-curved' },
+        { id: 'b4_breath', name: 'マグマブレス', type: 'statusAttack', damageMult: 1.2, statusId: 'defDown', turns: 2, chance: 65, cooldown: 2, icon: 'fa-fire' },
+        { id: 'b4_core', name: '炉心再生', type: 'heal', healRate: 0.16, triggerHpRate: 0.45, once: true, icon: 'fa-heart-circle-plus' }
+    ] },
+    5: { id: 'boss_stage_5', name: '氷鏡の女王フリジア', icon: 'fa-snowflake', base: { hp: 190, str: 18, vit: 11 }, tags: ['ice'], skills: [
+        { id: 'b5_frost', name: '氷鏡展開', type: 'buffSelf', turns: 2, atkMult: 1.3, cooldown: 3, icon: 'fa-icicles' },
+        { id: 'b5_zero', name: '絶対零度', type: 'statusAttack', damageMult: 1.1, statusId: 'freeze', turns: 1, chance: 60, cooldown: 2, icon: 'fa-temperature-empty' },
+        { id: 'b5_snow', name: '白霧治癒', type: 'heal', healRate: 0.18, triggerHpRate: 0.45, once: true, icon: 'fa-cloud' }
+    ] },
+    6: { id: 'boss_stage_6', name: '瘴王モルビドゥス', icon: 'fa-skull-crossbones', base: { hp: 205, str: 19, vit: 12 }, tags: ['miasma'], skills: [
+        { id: 'b6_miasma', name: '瘴気解放', type: 'buffSelf', turns: 2, atkMult: 1.35, cooldown: 3, icon: 'fa-smog' },
+        { id: 'b6_rot', name: '腐蝕霧', type: 'statusAttack', damageMult: 1.0, statusId: 'poison', turns: 2, chance: 70, poisonDamage: 6, cooldown: 2, icon: 'fa-skull-crossbones' },
+        { id: 'b6_absorb', name: '病魔吸収', type: 'heal', healRate: 0.2, triggerHpRate: 0.45, once: true, icon: 'fa-droplet' }
+    ] },
+    7: { id: 'boss_stage_7', name: '遺跡守護機オベリスク', icon: 'fa-monument', base: { hp: 220, str: 20, vit: 13 }, tags: ['ancient'], skills: [
+        { id: 'b7_overclock', name: '過負荷起動', type: 'buffSelf', turns: 2, atkMult: 1.35, cooldown: 3, icon: 'fa-gears' },
+        { id: 'b7_crush', name: '遺跡圧砕', type: 'statusAttack', damageMult: 1.2, statusId: 'defDown', turns: 2, chance: 65, cooldown: 2, icon: 'fa-hammer' },
+        { id: 'b7_repair', name: '自己修復', type: 'heal', healRate: 0.16, triggerHpRate: 0.45, once: true, icon: 'fa-screwdriver-wrench' }
+    ] },
+    8: { id: 'boss_stage_8', name: '幻惑魔ミラージュ', icon: 'fa-masks-theater', base: { hp: 235, str: 21, vit: 14 }, tags: ['illusion'], skills: [
+        { id: 'b8_focus', name: '幻影増幅', type: 'buffSelf', turns: 2, atkMult: 1.35, cooldown: 3, icon: 'fa-wand-magic-sparkles' },
+        { id: 'b8_trick', name: '虚像誘導', type: 'statusAttack', damageMult: 1.1, statusId: 'atkDown', turns: 2, chance: 70, cooldown: 2, icon: 'fa-eye-slash' },
+        { id: 'b8_dream', name: '夢喰い治癒', type: 'heal', healRate: 0.17, triggerHpRate: 0.45, once: true, icon: 'fa-bed' }
+    ] },
+    9: { id: 'boss_stage_9', name: '黒冠騎士アビスロード', icon: 'fa-chess-king', base: { hp: 250, str: 23, vit: 15 }, tags: ['dark'], skills: [
+        { id: 'b9_order', name: '黒の号令', type: 'buffSelf', turns: 2, atkMult: 1.4, cooldown: 3, icon: 'fa-flag' },
+        { id: 'b9_mark', name: '奈落の刻印', type: 'statusAttack', damageMult: 1.15, statusId: 'seal', turns: 1, chance: 75, cooldown: 2, icon: 'fa-stamp' },
+        { id: 'b9_darkheal', name: '奈落の吸収', type: 'heal', healRate: 0.16, triggerHpRate: 0.45, once: true, icon: 'fa-hand-holding-medical' }
+    ] },
+    10: { id: 'boss_stage_10', name: '白尖の主ルミナス・ドラグーン', icon: 'fa-chess-rook', base: { hp: 280, str: 25, vit: 17 }, tags: ['spire'], skills: [
+        { id: 'b10_aura', name: '純白領域', type: 'buffSelf', turns: 2, atkMult: 1.4, cooldown: 3, icon: 'fa-sun' },
+        { id: 'b10_lance', name: '天穿つ槍', type: 'statusAttack', damageMult: 1.2, statusId: 'attackCountDown', turns: 2, chance: 70, cooldown: 2, icon: 'fa-crosshairs' },
+        { id: 'b10_grace', name: '白光再生', type: 'heal', healRate: 0.18, triggerHpRate: 0.45, once: true, icon: 'fa-star' }
+    ] }
+};
+
 const STATUS_META = {
     atkUp: { short: '攻↑', kind: 'buff', icon: 'fa-arrow-up' },
     atkDown: { short: '攻↓', kind: 'debuff', icon: 'fa-arrow-down' },
@@ -454,6 +507,33 @@ const ItemGen = {
 // ==========================================
 const EnemyLogic = {
     generateEnemies: (nodeType) => {
+        if (nodeType === 'boss') {
+            const bossDef = BOSS_DEFINITIONS[State.stage];
+            const fallback = ENEMY_TEMPLATES.find(e => e.type === 'boss') || { name: 'ドラゴン (BOSS)', hp: 150, str: 15, vit: 8, icon: 'fa-dragon' };
+            const base = bossDef ? bossDef.base : { hp: fallback.hp, str: fallback.str, vit: fallback.vit };
+            const depthMult = 1 + (State.floor * 0.3) + ((State.stage - 1) * 1.2);
+            return [{
+                id: 'enemy_0',
+                bossId: bossDef ? bossDef.id : 'boss_fallback',
+                name: bossDef ? bossDef.name : fallback.name,
+                maxHp: Math.floor(base.hp * depthMult),
+                hp: Math.floor(base.hp * depthMult),
+                str: Math.floor(base.str * depthMult),
+                vit: Math.floor(base.vit * depthMult),
+                icon: bossDef ? bossDef.icon : fallback.icon,
+                block: 0,
+                intent: null,
+                statuses: [],
+                skills: bossDef ? bossDef.skills : [],
+                bossSkillState: {
+                    cooldowns: {},
+                    atkMult: 1,
+                    atkMultTurns: 0,
+                    onceFlags: {}
+                }
+            }];
+        }
+
         const count = nodeType === 'boss' ? 1 : (nodeType === 'elite' ? Utils.rand(1, 2) : Utils.rand(1, 3));
         const enemies = [];
         const pool = ENEMY_TEMPLATES.filter(e => e.type === nodeType || (nodeType === 'normal' && e.type === 'normal'));
@@ -476,7 +556,67 @@ const EnemyLogic = {
         }
         return enemies;
     },
+    getBossSkill: (enemy, skillId) => (enemy.skills || []).find(s => s.id === skillId),
+    canUseBossSkill: (enemy, skillId) => {
+        const st = enemy.bossSkillState || { cooldowns: {} };
+        return !st.cooldowns[skillId] || st.cooldowns[skillId] <= 0;
+    },
+    setBossSkillCooldown: (enemy, skillId) => {
+        const st = enemy.bossSkillState;
+        const skill = EnemyLogic.getBossSkill(enemy, skillId);
+        if (!st || !skill || !skill.cooldown) return;
+        st.cooldowns[skillId] = skill.cooldown;
+    },
+    decrementBossState: (enemy) => {
+        if (!enemy.bossSkillState) return;
+        const st = enemy.bossSkillState;
+        Object.keys(st.cooldowns || {}).forEach(id => {
+            if (st.cooldowns[id] > 0) st.cooldowns[id]--;
+        });
+        if (st.atkMultTurns > 0) {
+            st.atkMultTurns--;
+            if (st.atkMultTurns <= 0) st.atkMult = 1;
+        }
+    },
+    decideBossIntent: (enemy) => {
+        const st = enemy.bossSkillState || (enemy.bossSkillState = { cooldowns: {}, atkMult: 1, atkMultTurns: 0, onceFlags: {} });
+        const hpRate = enemy.maxHp > 0 ? enemy.hp / enemy.maxHp : 1;
+
+        const healSkill = (enemy.skills || []).find(sk => sk.type === 'heal' && hpRate <= sk.triggerHpRate && (!sk.once || !st.onceFlags[sk.id]));
+        if (healSkill) {
+            return { type: 'heal', skillId: healSkill.id, value: Math.max(1, Math.floor(enemy.maxHp * healSkill.healRate)), icon: healSkill.icon, color: 'text-green-600' };
+        }
+
+        const statusSkill = (enemy.skills || []).find(sk => sk.type === 'statusAttack' && EnemyLogic.canUseBossSkill(enemy, sk.id));
+        if (statusSkill && Utils.rand(1, 100) <= 35) {
+            const baseMult = st.atkMultTurns > 0 ? st.atkMult : 1;
+            return {
+                type: 'statusAttack',
+                skillId: statusSkill.id,
+                value: Math.floor(enemy.str * statusSkill.damageMult * baseMult),
+                turns: statusSkill.turns,
+                chance: statusSkill.chance,
+                statusId: statusSkill.statusId,
+                poisonDamage: statusSkill.poisonDamage || 0,
+                icon: statusSkill.icon,
+                color: 'text-lime-700'
+            };
+        }
+
+        const buffSkill = (enemy.skills || []).find(sk => sk.type === 'buffSelf' && EnemyLogic.canUseBossSkill(enemy, sk.id));
+        if (buffSkill && st.atkMultTurns <= 0 && Utils.rand(1, 100) <= 45) {
+            return { type: 'buffSelf', skillId: buffSkill.id, turns: buffSkill.turns, atkMult: buffSkill.atkMult, icon: buffSkill.icon, color: 'text-amber-600' };
+        }
+
+        const baseMult = st.atkMultTurns > 0 ? st.atkMult : 1;
+        return { type: 'attack', value: Math.floor(enemy.str * baseMult), icon: 'fa-khanda', color: 'text-red-500' };
+    },
     decideIntent: (enemy) => {
+        if (enemy.bossId && enemy.bossId.startsWith('boss_stage_') && enemy.skills && enemy.skills.length > 0) {
+            enemy.intent = EnemyLogic.decideBossIntent(enemy);
+            return;
+        }
+
         const rand = Utils.rand(1, 100);
         let intent = {};
         if (rand > 80) {
@@ -601,6 +741,34 @@ const EnemyLogic = {
                     enemy.block += intent.value;
                     Utils.log(`${enemy.name}は防御の構えをとった! (ブロック+${intent.value})`);
                     Utils.showTextAnim(`en-${enemy.id}`, `+${intent.value}`, 'block');
+                } else if (intent.type === 'buffSelf') {
+                    enemy.bossSkillState.atkMult = intent.atkMult;
+                    enemy.bossSkillState.atkMultTurns = intent.turns;
+                    EnemyLogic.setBossSkillCooldown(enemy, intent.skillId);
+                    Utils.log(`${enemy.name}は${EnemyLogic.getBossSkill(enemy, intent.skillId)?.name || '強化'}を使った! (攻撃力上昇)`);
+                    Utils.showTextAnim(`en-${enemy.id}`, 'ATK UP', 'block');
+                } else if (intent.type === 'statusAttack') {
+                    EnemyLogic.applyDamageToPlayer(enemy.name, intent.value);
+                    EnemyLogic.setBossSkillCooldown(enemy, intent.skillId);
+                    if (Utils.rand(1, 100) <= intent.chance) {
+                        const statusOwner = { statuses: State.combat.playerStatuses };
+                        if (intent.statusId === 'poison') {
+                            Utils.applyStatus(statusOwner, 'poison', intent.turns, 1, true, intent.poisonDamage || Math.max(1, Math.floor(intent.value * 0.2)));
+                            Utils.log(`${enemy.name}の${EnemyLogic.getBossSkill(enemy, intent.skillId)?.name || '特殊攻撃'}! プレイヤーは毒に侵された!`);
+                            Utils.showTextAnim('player-hp-bar', '毒', 'block');
+                        } else {
+                            Utils.applyStatus(statusOwner, intent.statusId, intent.turns);
+                            Utils.log(`${enemy.name}の${EnemyLogic.getBossSkill(enemy, intent.skillId)?.name || '特殊攻撃'}! 状態異常が付与された!`);
+                            Utils.showTextAnim('player-hp-bar', 'DEBUFF', 'block');
+                        }
+                    }
+                } else if (intent.type === 'heal') {
+                    const before = enemy.hp;
+                    enemy.hp = Math.min(enemy.maxHp, enemy.hp + intent.value);
+                    enemy.bossSkillState.onceFlags[intent.skillId] = true;
+                    const healed = enemy.hp - before;
+                    Utils.log(`${enemy.name}は${EnemyLogic.getBossSkill(enemy, intent.skillId)?.name || '回復'}で ${healed} 回復した!`);
+                    Utils.showTextAnim(`en-${enemy.id}`, `+${healed}`, 'heal');
                 }
 
                 Game.renderPlayerInfo();
@@ -613,6 +781,7 @@ const EnemyLogic = {
                 }
 
                 Utils.decrementStatuses(enemy);
+                EnemyLogic.decrementBossState(enemy);
                 i++;
                 processNextEnemy();
             }, 600);
@@ -661,6 +830,14 @@ const EnemyLogic = {
 // 6. メインゲームコントローラー
 // ==========================================
 const Game = {
+    validateBossDefinitions: () => {
+        STAGES.forEach(stage => {
+            if (!BOSS_DEFINITIONS[stage.id]) {
+                console.warn(`[BossDefinition] 未設定: stage=${stage.id} (${stage.name})`);
+            }
+        });
+    },
+
     init: () => {
         State.maxUnlockedStage = 1;
         State.fullLogs = [];
@@ -684,6 +861,8 @@ const Game = {
         document.getElementById('header-floor').classList.remove('hidden');
         document.getElementById('header-gold').classList.remove('hidden');
         document.getElementById('bottom-menu').classList.remove('hidden');
+
+        Game.validateBossDefinitions();
         
         Game.renderStageSelect();
     },
@@ -806,7 +985,13 @@ const Game = {
     generateNodes: () => {
         State.nodes = [];
         if (State.floor === 5) {
-            State.nodes.push({ type: 'boss', name: 'ボス', icon: 'fa-skull', color: 'text-red-600 bg-red-50 border-red-200' });
+            const bossDef = BOSS_DEFINITIONS[State.stage];
+            State.nodes.push({
+                type: 'boss',
+                name: bossDef ? bossDef.name : 'ボス',
+                icon: bossDef ? bossDef.icon : 'fa-skull',
+                color: 'text-red-600 bg-red-50 border-red-200'
+            });
             return;
         }
         
@@ -1900,7 +2085,6 @@ window.onload = Game.init;
 </script>
 </body>
 </html>
-
 
 
 
