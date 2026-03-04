@@ -159,6 +159,18 @@ const STAGES = [
     { id: 10, name: '白の尖塔' }
 ];
 
+const STATUS_META = {
+    atkUp: { short: '攻↑', kind: 'buff', icon: 'fa-arrow-up' },
+    atkDown: { short: '攻↓', kind: 'debuff', icon: 'fa-arrow-down' },
+    defUp: { short: '防↑', kind: 'buff', icon: 'fa-shield' },
+    defDown: { short: '防↓', kind: 'debuff', icon: 'fa-shield-halved' },
+    attackCountUp: { short: '回↑', kind: 'buff', icon: 'fa-bolt' },
+    attackCountDown: { short: '回↓', kind: 'debuff', icon: 'fa-hourglass-half' },
+    freeze: { short: '凍', kind: 'debuff', icon: 'fa-snowflake' },
+    seal: { short: '封', kind: 'debuff', icon: 'fa-ban' },
+    poison: { short: '毒', kind: 'debuff', icon: 'fa-skull-crossbones' }
+};
+
 // ==========================================
 // 2. ゲームステート
 // ==========================================
@@ -189,6 +201,7 @@ const State = {
         currentTargetIdx: 0,
         attacksLeft: 0,
         cooldowns: {},
+        playerStatuses: [],
         buffs: {},
         defendUsed: false
     },
@@ -241,6 +254,57 @@ const Utils = {
         });
         return bonus;
     },
+    hasStatus: (owner, statusId) => {
+        if (!owner || !owner.statuses) return false;
+        return owner.statuses.some(st => st.id === statusId && st.turns > 0);
+    },
+    getStatusStacks: (owner, statusId) => {
+        if (!owner || !owner.statuses) return 0;
+        return owner.statuses.filter(st => st.id === statusId && st.turns > 0).reduce((sum, st) => sum + (st.stacks || 1), 0);
+    },
+    applyStatus: (owner, statusId, turns, stacks = 1, stackable = false, fixedValue = 0) => {
+        if (!owner.statuses) owner.statuses = [];
+        if (stackable) {
+            owner.statuses.push({ id: statusId, turns, stacks, fixedValue, stackable: true });
+            return;
+        }
+        const existing = owner.statuses.find(st => st.id === statusId);
+        if (existing) {
+            existing.turns = Math.max(existing.turns, turns);
+            existing.stacks = stacks;
+            existing.fixedValue = fixedValue;
+        } else {
+            owner.statuses.push({ id: statusId, turns, stacks, fixedValue, stackable: false });
+        }
+    },
+    decrementStatuses: (owner) => {
+        if (!owner || !owner.statuses) return;
+        owner.statuses = owner.statuses
+            .map(st => ({ ...st, turns: st.turns - 1 }))
+            .filter(st => st.turns > 0);
+    },
+    buildStatusBadges: (owner) => {
+        if (!owner || !owner.statuses) return '';
+        return owner.statuses
+            .filter(st => st.turns > 0 && STATUS_META[st.id])
+            .map(st => {
+                const meta = STATUS_META[st.id];
+                const cls = meta.kind === 'buff'
+                    ? 'bg-green-50 text-green-700 border-green-300'
+                    : 'bg-red-50 text-red-700 border-red-300';
+                const stackText = st.stackable && st.stacks > 1 ? `x${st.stacks}` : '';
+                return `<span class="inline-flex items-center border rounded px-1 py-0.5 text-[9px] font-bold ${cls}"><i class="fa-solid ${meta.icon} mr-0.5"></i>${meta.short}${stackText}:${st.turns}</span>`;
+            })
+            .join(' ');
+    },
+    getPlayerAttackCount: () => {
+        const base = State.player.equip.weapon ? State.player.equip.weapon.hits : 1;
+        const owner = { statuses: State.combat.playerStatuses || [] };
+        let val = base;
+        if (Utils.hasStatus(owner, 'attackCountUp')) val += 1;
+        if (Utils.hasStatus(owner, 'attackCountDown')) val -= 1;
+        return Math.max(1, val);
+    },
     getTotalStat: (stat) => {
         let base = State.player.stats[stat] + State.player.addedStats[stat] + Utils.getBonusStat(stat) + Utils.getPassiveBonus(stat);
         if (State.inDungeon && State.combat && State.combat.buffs) {
@@ -250,7 +314,18 @@ const Utils = {
             if (stat === 'dex' && b.dexUp && b.dexUp.turns > 0) base = Math.floor(base * b.dexUp.mult);
             if (stat === 'int' && b.intUp && b.intUp.turns > 0) base = Math.floor(base * b.intUp.mult);
         }
-        return base;
+        if (State.inDungeon && State.combat && State.combat.playerStatuses) {
+            const p = { statuses: State.combat.playerStatuses };
+            if (stat === 'str') {
+                if (Utils.hasStatus(p, 'atkUp')) base = Math.floor(base * 1.25);
+                if (Utils.hasStatus(p, 'atkDown')) base = Math.floor(base * 0.75);
+            }
+            if (stat === 'vit') {
+                if (Utils.hasStatus(p, 'defUp')) base = Math.floor(base * 1.25);
+                if (Utils.hasStatus(p, 'defDown')) base = Math.floor(base * 0.75);
+            }
+        }
+        return Math.max(1, base);
     },
     getCompareHtml: (newItem, currItem, statName) => {
         if (!currItem) return `<span class="text-green-500 font-bold text-[10px] ml-1">▲NEW</span>`;
@@ -393,7 +468,7 @@ const EnemyLogic = {
                 icon: tpl.icon,
                 block: 0,
                 intent: null,
-                poison: 0
+                statuses: []
             });
         }
         return enemies;
@@ -458,6 +533,14 @@ const EnemyLogic = {
             Utils.showTextAnim('player-hp-bar', `-${actualDmg}`, 'damage');
             const el = document.getElementById('player-info-block');
             if(el) { el.classList.add('anim-damage'); setTimeout(() => el.classList.remove('anim-damage'), 300); }
+
+            const roll = Utils.rand(1, 100);
+            if (roll <= 8) { Utils.applyStatus({ statuses: State.combat.playerStatuses }, 'freeze', 1); Utils.log('プレイヤーは凍結した!'); }
+            else if (roll <= 16) { Utils.applyStatus({ statuses: State.combat.playerStatuses }, 'seal', 1); Utils.log('プレイヤーは封印された!'); }
+            else if (roll <= 24) { Utils.applyStatus({ statuses: State.combat.playerStatuses }, 'attackCountDown', 1); Utils.log('プレイヤーの攻撃回数が減少!'); }
+            else if (roll <= 32) { Utils.applyStatus({ statuses: State.combat.playerStatuses }, 'atkDown', 2); Utils.log('プレイヤーの攻撃力が低下!'); }
+            else if (roll <= 40) { Utils.applyStatus({ statuses: State.combat.playerStatuses }, 'defDown', 2); Utils.log('プレイヤーの防御力が低下!'); }
+            else if (roll <= 50) { Utils.applyStatus({ statuses: State.combat.playerStatuses }, 'poison', 2, 1, true, Math.max(1, Math.floor(rawDmg * 0.2))); Utils.log('プレイヤーは毒状態になった!'); }
         } else if (rawDmg > 0 && actualDmg === 0) {
             Utils.showTextAnim('player-hp-bar', 'BLOCKED', 'block');
         }
@@ -476,7 +559,7 @@ const EnemyLogic = {
                 State.combat.turn++;
                 State.player.block = 0;
                 State.combat.defendUsed = false;
-                State.combat.attacksLeft = State.player.equip.weapon ? State.player.equip.weapon.hits : 1;
+                State.combat.attacksLeft = Utils.getPlayerAttackCount();
                 
                 // クールタイム減少
                 for(let id in State.combat.cooldowns) {
@@ -496,14 +579,23 @@ const EnemyLogic = {
 
             setTimeout(() => {
                 // 毒ダメージ処理
-                if (enemy.poison > 0) {
-                    enemy.hp -= enemy.poison;
-                    Utils.showTextAnim(`en-${enemy.id}`, `-${enemy.poison}`, 'damage');
-                    Utils.log(`${enemy.name}は毒で ${enemy.poison} のダメージ!`);
+                const poisonTicks = (enemy.statuses || []).filter(st => st.id === 'poison' && st.turns > 0);
+                if (poisonTicks.length > 0) {
+                    const poisonDmg = poisonTicks.reduce((sum, st) => sum + (st.fixedValue || 0), 0);
+                    enemy.hp -= poisonDmg;
+                    Utils.showTextAnim(`en-${enemy.id}`, `-${poisonDmg}`, 'damage');
+                    Utils.log(`${enemy.name}は毒で ${poisonDmg} のダメージ!`);
                     if (enemy.hp <= 0) {
                         Game.renderEnemies();
                         i++; processNextEnemy(); return;
                     }
+                }
+                if (Utils.hasStatus(enemy, 'freeze')) {
+                    Utils.log(`${enemy.name}は凍結で行動できない!`);
+                    Utils.showTextAnim(`en-${enemy.id}`, '凍結', 'block');
+                    Utils.decrementStatuses(enemy);
+                    Game.renderEnemies();
+                    i++; processNextEnemy(); return;
                 }
 
                 const intent = enemy.intent;
@@ -524,6 +616,7 @@ const EnemyLogic = {
                     return;
                 }
 
+                Utils.decrementStatuses(enemy);
                 i++;
                 processNextEnemy();
             }, 600);
@@ -553,8 +646,7 @@ const EnemyLogic = {
 
         // 毒武器バフの処理
         if (actualDmg > 0 && State.combat.buffs.poisonWeapon && State.combat.buffs.poisonWeapon.turns > 0) {
-            if(!enemy.poison) enemy.poison = 0;
-            enemy.poison += State.combat.buffs.poisonWeapon.dmg;
+            Utils.applyStatus(enemy, 'poison', 2, 1, true, State.combat.buffs.poisonWeapon.dmg);
             Utils.showTextAnim(`en-${enemy.id}`, 'POISON', 'block');
         }
 
@@ -891,12 +983,13 @@ const Game = {
         State.combat.turn = 1;
         State.combat.isPlayerTurn = true;
         State.combat.currentTargetIdx = 0;
-        State.combat.attacksLeft = State.player.equip.weapon ? State.player.equip.weapon.hits : 1;
+        State.combat.attacksLeft = Utils.getPlayerAttackCount();
         State.logs = ['戦闘開始！'];
         State.player.block = 0;
         
         State.combat.cooldowns = State.combat.cooldowns || {}; // フロアを跨いでもCTを維持
         State.combat.buffs = { atkUp: {turns:0}, defUp: {turns:0}, dexUp: {turns:0}, intUp: {turns:0}, magicShield: 0, evasion: 0, poisonWeapon: {turns:0} };
+        State.combat.playerStatuses = [];
         State.combat.defendUsed = false;
 
         State.combat.enemies.forEach(e => EnemyLogic.decideIntent(e));
@@ -955,7 +1048,7 @@ const Game = {
 
             let blockHtml = '';
             if (enemy.block > 0) blockHtml += `<div class="absolute -right-2 top-0 bg-blue-100 border border-blue-400 text-blue-800 text-[10px] px-1 rounded font-bold"><i class="fa-solid fa-shield"></i> ${enemy.block}</div>`;
-            if (enemy.poison > 0) blockHtml += `<div class="absolute -right-2 top-4 bg-purple-100 border border-purple-400 text-purple-800 text-[10px] px-1 rounded font-bold"><i class="fa-solid fa-droplet"></i> ${enemy.poison}</div>`;
+            const enemyBadgeHtml = Utils.buildStatusBadges(enemy);
 
             html += `
                 <div id="en-${enemy.id}" ${clickAction} class="relative w-24 h-32 bg-white border rounded-lg flex flex-col items-center justify-between p-2 transition-all ${cursor} ${borderStyle}">
@@ -968,6 +1061,7 @@ const Game = {
                             <div class="bg-red-500 h-full transition-all duration-300" style="width: ${hpPercent}%"></div>
                         </div>
                         <div class="text-[9px] mt-0.5">${enemy.hp} / ${enemy.maxHp}</div>
+                        <div class="text-[9px] mt-1 min-h-[16px] flex flex-wrap gap-1 justify-center">${enemyBadgeHtml}</div>
                     </div>
                 </div>
             `;
@@ -998,16 +1092,9 @@ const Game = {
         
         let buffHtml = '';
         if (p.block > 0) buffHtml += `<span class="ml-1 text-blue-600 text-xs font-bold border border-blue-400 bg-blue-50 px-1 rounded"><i class="fa-solid fa-shield"></i> ${p.block}</span>`;
-        if (State.combat.buffs) {
-            const b = State.combat.buffs;
-            if(b.atkUp.turns > 0) buffHtml += `<span class="ml-1 text-red-500 text-xs font-bold"><i class="fa-solid fa-arrow-up"></i>ATK</span>`;
-            if(b.defUp.turns > 0) buffHtml += `<span class="ml-1 text-blue-500 text-xs font-bold"><i class="fa-solid fa-arrow-up"></i>DEF</span>`;
-            if(b.dexUp.turns > 0) buffHtml += `<span class="ml-1 text-green-500 text-xs font-bold"><i class="fa-solid fa-arrow-up"></i>DEX</span>`;
-            if(b.intUp.turns > 0) buffHtml += `<span class="ml-1 text-purple-500 text-xs font-bold"><i class="fa-solid fa-arrow-up"></i>INT</span>`;
-            if(b.magicShield > 0) buffHtml += `<span class="ml-1 text-purple-600 text-xs font-bold"><i class="fa-solid fa-shield"></i>MS</span>`;
-            if(b.evasion > 0) buffHtml += `<span class="ml-1 text-green-600 text-xs font-bold"><i class="fa-solid fa-wind"></i>見切</span>`;
-            if(b.poisonWeapon.turns > 0) buffHtml += `<span class="ml-1 text-purple-800 text-xs font-bold"><i class="fa-solid fa-droplet"></i>毒刃</span>`;
-        }
+        const playerStatusOwner = { statuses: State.combat.playerStatuses || [] };
+        const statusBadges = Utils.buildStatusBadges(playerStatusOwner);
+        if (statusBadges) buffHtml += `<span class="ml-1 inline-flex flex-wrap gap-1 align-middle">${statusBadges}</span>`;
 
         container.innerHTML = `
             <div class="flex justify-between items-end mb-1">
@@ -1054,10 +1141,12 @@ const Game = {
             return;
         }
 
-        const maxAttacks = State.player.equip.weapon ? State.player.equip.weapon.hits : 1;
+        const maxAttacks = Utils.getPlayerAttackCount();
         const hasAttacked = State.combat.attacksLeft < maxAttacks;
-        const canAttack = State.combat.attacksLeft > 0 && !State.combat.defendUsed;
-        const canDefend = !hasAttacked && !State.combat.defendUsed;
+        const isFrozen = Utils.hasStatus({ statuses: State.combat.playerStatuses }, 'freeze');
+        const isSealed = Utils.hasStatus({ statuses: State.combat.playerStatuses }, 'seal');
+        const canAttack = State.combat.attacksLeft > 0 && !State.combat.defendUsed && !isFrozen;
+        const canDefend = !hasAttacked && !State.combat.defendUsed && !isFrozen;
 
         const jobName = State.player.job.name;
         let defendName = '防御';
@@ -1098,7 +1187,7 @@ const Game = {
             skills.forEach(s => {
                 const lv = State.player.skillLevels[s.id];
                 const ct = State.combat.cooldowns[s.id] || 0;
-                const canUse = State.player.cp >= s.cost && ct === 0;
+                const canUse = State.player.cp >= s.cost && ct === 0 && !isSealed && !isFrozen;
                 const skillBtnClass = canUse ? 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100' : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed';
                 
                 html += `
@@ -1129,6 +1218,8 @@ const Game = {
         if (!target || target.hp <= 0) return;
 
         const s = State.player.job.skills.find(x => x.id === skillId);
+        if (Utils.hasStatus({ statuses: State.combat.playerStatuses }, 'seal')) { Utils.log('封印中はスキルを使用できない!'); return; }
+        if (Utils.hasStatus({ statuses: State.combat.playerStatuses }, 'freeze')) { Utils.log('凍結中は行動できない!'); return; }
         const lv = State.player.skillLevels[s.id];
         
         State.player.cp -= s.cost;
@@ -1150,10 +1241,10 @@ const Game = {
                 if(e.hp > 0) EnemyLogic.applyDamageToEnemy(e, Math.max(1, Math.floor(atk * (0.8 + lv * 0.2))));
             });
         } else if (s.id === 'w_s1') {
-            State.combat.buffs.atkUp = { turns: 3, mult: 1 + (0.2 + lv*0.1) };
+            Utils.applyStatus({ statuses: State.combat.playerStatuses }, 'atkUp', 3);
             Utils.log(`${s.name}！ 3ターン攻撃力上昇！`);
         } else if (s.id === 'w_s2') {
-            State.combat.buffs.defUp = { turns: 3, mult: 1 + (0.2 + lv*0.1) };
+            Utils.applyStatus({ statuses: State.combat.playerStatuses }, 'defUp', 3);
             Utils.log(`${s.name}！ 3ターン防御力上昇！`);
         }
         // 盗賊スキル
@@ -1172,8 +1263,8 @@ const Game = {
             const actual = EnemyLogic.applyDamageToEnemy(target, dmg, true);
             Utils.log(`${s.name}！ 防御を無視して ${actual} ダメージ！`);
         } else if (s.id === 't_s1') {
-            State.combat.buffs.dexUp = { turns: 3, mult: 1 + (0.2 + lv*0.1) };
-            Utils.log(`${s.name}！ 3ターンDEX上昇！`);
+            Utils.applyStatus({ statuses: State.combat.playerStatuses }, 'attackCountUp', 3);
+            Utils.log(`${s.name}！ 3ターン攻撃回数上昇！`);
         } else if (s.id === 't_s2') {
             State.combat.buffs.poisonWeapon = { turns: 3, dmg: lv * 2 };
             Utils.log(`${s.name}！ 武器に毒を塗布した！`);
@@ -1212,6 +1303,7 @@ const Game = {
 
     usePotion: () => {
         if (!State.combat.isPlayerTurn) return;
+        if (Utils.hasStatus({ statuses: State.combat.playerStatuses }, 'freeze')) { Utils.log('凍結中は行動できない!'); return; }
         if(State.player.cp < 10) { Utils.log("CPが足りません"); return; }
         
         State.player.cp -= 10;
@@ -1225,9 +1317,10 @@ const Game = {
     },
 
     executeDefend: () => {
-        const maxAttacks = State.player.equip.weapon ? State.player.equip.weapon.hits : 1;
+        const maxAttacks = Utils.getPlayerAttackCount();
         const hasAttacked = State.combat.attacksLeft < maxAttacks;
         if (!State.combat.isPlayerTurn || State.combat.defendUsed || hasAttacked) return;
+        if (Utils.hasStatus({ statuses: State.combat.playerStatuses }, 'freeze')) return;
         
         State.combat.defendUsed = true;
         Game.renderCommands();
@@ -1253,6 +1346,7 @@ const Game = {
 
     executePlayerAction: (actionType) => {
         if (!State.combat.isPlayerTurn) return;
+        if (Utils.hasStatus({ statuses: State.combat.playerStatuses }, 'freeze')) { Utils.log('凍結中は行動できない!'); return; }
 
         let target = State.combat.enemies[State.combat.currentTargetIdx];
         if (!target || target.hp <= 0) {
@@ -1309,6 +1403,21 @@ const Game = {
 
     endPlayerTurn: () => {
         if (!State.combat.isPlayerTurn) return;
+
+        const playerStatusOwner = { statuses: State.combat.playerStatuses || [] };
+        const poisonTicks = playerStatusOwner.statuses.filter(st => st.id === 'poison' && st.turns > 0);
+        if (poisonTicks.length > 0) {
+            const poisonDmg = poisonTicks.reduce((sum, st) => sum + (st.fixedValue || 0), 0);
+            State.player.hp = Math.max(0, State.player.hp - poisonDmg);
+            Utils.log(`プレイヤーは毒で ${poisonDmg} ダメージを受けた!`);
+            Utils.showTextAnim('player-hp-bar', `-${poisonDmg}`, 'damage');
+            if (State.player.hp <= 0) {
+                Game.renderCombat();
+                Game.gameOver();
+                return;
+            }
+        }
+
         State.combat.isPlayerTurn = false;
         
         // バフターン減少 (プレイヤー行動終了時)
@@ -1319,6 +1428,8 @@ const Game = {
                 State.combat.buffs[key]--;
             }
         }
+        Utils.decrementStatuses(playerStatusOwner);
+        State.combat.playerStatuses = playerStatusOwner.statuses;
         
         Game.renderCombat();
         EnemyLogic.executeEnemyTurn();
@@ -1788,7 +1899,6 @@ window.onload = Game.init;
 </script>
 </body>
 </html>
-
 
 
 
