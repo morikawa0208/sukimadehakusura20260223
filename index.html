@@ -534,13 +534,6 @@ const EnemyLogic = {
             const el = document.getElementById('player-info-block');
             if(el) { el.classList.add('anim-damage'); setTimeout(() => el.classList.remove('anim-damage'), 300); }
 
-            const roll = Utils.rand(1, 100);
-            if (roll <= 8) { Utils.applyStatus({ statuses: State.combat.playerStatuses }, 'freeze', 1); Utils.log('プレイヤーは凍結した!'); }
-            else if (roll <= 16) { Utils.applyStatus({ statuses: State.combat.playerStatuses }, 'seal', 1); Utils.log('プレイヤーは封印された!'); }
-            else if (roll <= 24) { Utils.applyStatus({ statuses: State.combat.playerStatuses }, 'attackCountDown', 1); Utils.log('プレイヤーの攻撃回数が減少!'); }
-            else if (roll <= 32) { Utils.applyStatus({ statuses: State.combat.playerStatuses }, 'atkDown', 2); Utils.log('プレイヤーの攻撃力が低下!'); }
-            else if (roll <= 40) { Utils.applyStatus({ statuses: State.combat.playerStatuses }, 'defDown', 2); Utils.log('プレイヤーの防御力が低下!'); }
-            else if (roll <= 50) { Utils.applyStatus({ statuses: State.combat.playerStatuses }, 'poison', 2, 1, true, Math.max(1, Math.floor(rawDmg * 0.2))); Utils.log('プレイヤーは毒状態になった!'); }
         } else if (rawDmg > 0 && actualDmg === 0) {
             Utils.showTextAnim('player-hp-bar', 'BLOCKED', 'block');
         }
