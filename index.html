@@ -2396,7 +2396,26 @@ const Game = {
         Game.showInventory();
     },
 
-    showImprintLab: () => {
+    sellImprintsBySignature: (signature) => {
+        Utils.ensureInventoryStructure();
+        const equippedIds = new Set(Utils.getEquippedImprints().map(im => im.id));
+        const targets = State.player.inventory.imprints.filter(im => {
+            const sig = `${im.category}|${im.rank}|${im.cost}|${im.effectKey}|${im.rankBonus}|${im.uniqueKey}`;
+            return sig === signature && !equippedIds.has(im.id);
+        });
+        if (targets.length <= 0) {
+            alert('装着中の刻印は売却できません。');
+            return;
+        }
+        const unitPrice = Math.max(1, targets[0].rank * 4 + targets[0].cost * 3);
+        State.player.gold += unitPrice * targets.length;
+        const targetIds = new Set(targets.map(im => im.id));
+        State.player.inventory.imprints = State.player.inventory.imprints.filter(im => !targetIds.has(im.id));
+        Game.updateHeader();
+        Game.showImprintLab();
+    },
+
+    showImprintLab: (filterRank = 0) => {
         Utils.ensureInventoryStructure();
         const sealed = State.player.inventory.sealedImprints;
         const summary = Utils.getImprintEffectsSummary();
@@ -2413,6 +2432,27 @@ const Game = {
             </div>`;
         };
 
+        const equippedIds = new Set(Utils.getEquippedImprints().map(im => im.id));
+        const groupedMap = {};
+        State.player.inventory.imprints.forEach(im => {
+            const sig = `${im.category}|${im.rank}|${im.cost}|${im.effectKey}|${im.rankBonus}|${im.uniqueKey}`;
+            if (!groupedMap[sig]) {
+                groupedMap[sig] = { ...im, count: 0, freeCount: 0, signature: sig };
+            }
+            groupedMap[sig].count += 1;
+            if (!equippedIds.has(im.id)) groupedMap[sig].freeCount += 1;
+        });
+
+        const groupedList = Object.values(groupedMap)
+            .filter(g => (filterRank === 0 ? true : g.rank === filterRank))
+            .sort((a, b) => (b.rank - a.rank) || a.effectKey.localeCompare(b.effectKey) || b.rankBonus - a.rankBonus);
+
+        const rankFilterButtons = ['全て', '1', '2', '3', '4', '5', '6'].map(label => {
+            const rank = label === '全て' ? 0 : Number(label);
+            const active = rank === filterRank;
+            return `<button onclick="Game.showImprintLab(${rank})" class="px-2 py-1 rounded text-[10px] border ${active ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300'}">${label}</button>`;
+        }).join('');
+
         let html = `<h3 class="font-bold text-lg mb-3 border-b pb-2"><i class="fa-solid fa-stamp mr-2"></i>刻印工房（鑑定無料）</h3>
             <div class="space-y-2 mb-3">${renderStack('rough')}${renderStack('refined')}${renderStack('gleaming')}</div>
             <div class="flex gap-1 mb-3">
@@ -2425,21 +2465,42 @@ const Game = {
                 ${effectRows || '<div class="text-[11px] text-gray-400">有効な刻印効果なし</div>'}
                 <div class="text-[11px] text-pink-700 mt-1">Rank6: 攻撃回数+1（同uniqueKeyは1回のみ適用）</div>
             </div>
-            <div class="max-h-56 overflow-y-auto space-y-2 hide-scrollbar">`;
+            <div class="border rounded p-2 mb-2 bg-white">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="font-bold text-xs"><i class="fa-solid fa-warehouse mr-1"></i>刻印倉庫（ランク順）</div>
+                    <div class="text-[10px] text-gray-500">所持 ${State.player.inventory.imprints.length} 個</div>
+                </div>
+                <div class="flex flex-wrap gap-1 mb-2">${rankFilterButtons}</div>
+                <div class="max-h-56 overflow-y-auto space-y-2 hide-scrollbar">`;
 
-        State.player.inventory.imprints.forEach(im => {
-            const cls = Utils.getImprintRankColor(im.rank);
-            const bonusText = im.rank === 6 ? '-' : im.rankBonus.toFixed(1);
-            html += `<div class="p-2 border rounded text-xs ${cls}">
-                <div class="font-bold">${IMPRINT_CATEGORY[im.category].name} Rank${im.rank} / cost${im.cost}</div>
-                <div>effect:${im.effectKey} / bonus:${bonusText}</div>
-            </div>`;
-        });
-        html += `</div><button onclick="Game.closeModal()" class="mt-3 px-3 py-2 bg-gray-800 text-white rounded text-sm w-full">閉じる</button>`;
+        if (groupedList.length === 0) {
+            html += `<div class="text-center text-gray-400 text-xs py-4">条件に合う刻印がありません</div>`;
+        } else {
+            groupedList.forEach(im => {
+                const cls = Utils.getImprintRankColor(im.rank);
+                const bonusText = im.rank === 6 ? '-' : im.rankBonus.toFixed(1);
+                const unitPrice = Math.max(1, im.rank * 4 + im.cost * 3);
+                html += `<div class="p-2 border rounded text-xs ${cls}">
+                    <div class="flex justify-between items-start gap-2">
+                        <div>
+                            <div class="font-bold">${IMPRINT_CATEGORY[im.category].name} Rank${im.rank} / cost${im.cost} ×${im.count}</div>
+                            <div>effect:${im.effectKey} / bonus:${bonusText}</div>
+                            <div class="text-[10px] text-gray-600">売却可能 ${im.freeCount} 個（装着中 ${im.count - im.freeCount} 個）</div>
+                        </div>
+                        <button onclick="Game.sellImprintsBySignature('${im.signature}')" class="px-2 py-1 bg-yellow-100 text-yellow-800 border border-yellow-300 rounded text-[10px] font-bold" ${im.freeCount < 1 ? 'disabled' : ''}>
+                            売却 ${unitPrice * im.freeCount}G
+                        </button>
+                    </div>
+                </div>`;
+            });
+        }
+
+        html += `</div></div><button onclick="Game.closeModal()" class="mt-3 px-3 py-2 bg-gray-800 text-white rounded text-sm w-full">閉じる</button>`;
         Game.showModal(html);
     },
 
     showInventory: () => {
+
         Utils.ensureInventoryStructure();
         const p = State.player;
         const gearBag = p.inventory.equipment;
