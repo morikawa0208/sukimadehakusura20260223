@@ -1504,7 +1504,11 @@ const Game = {
             
             let intentHtml = '';
             if (enemy.intent) {
-                const intentName = enemy.intent.name || (enemy.intent.type === 'attack' ? '通常攻撃' : '行動');
+                const baseIntentName = enemy.intent.name || (enemy.intent.type === 'attack' ? '通常攻撃' : (enemy.intent.type === 'defend' ? '防御' : '行動'));
+                const isSpecialIntent = !!enemy.intent.skillId;
+                const intentName = (!isSpecialIntent && typeof enemy.intent.value === 'number' && enemy.intent.value > 0)
+                    ? `${baseIntentName} ${enemy.intent.value}`
+                    : baseIntentName;
                 const intentDesc = enemy.intent.desc || (enemy.intent.value > 0 ? `予測ダメージ: ${enemy.intent.value}` : '行動情報なし');
                 intentHtml = `
                     <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-white px-2 py-1 border rounded shadow text-[10px] font-bold ${enemy.intent.color} whitespace-nowrap z-10 flex items-center gap-1">
