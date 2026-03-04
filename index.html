@@ -264,18 +264,21 @@ const Utils = {
     },
     applyStatus: (owner, statusId, turns, stacks = 1, stackable = false, fixedValue = 0) => {
         if (!owner.statuses) owner.statuses = [];
-        if (stackable) {
-            owner.statuses.push({ id: statusId, turns, stacks, fixedValue, stackable: true });
-            return;
-        }
         const existing = owner.statuses.find(st => st.id === statusId);
         if (existing) {
             existing.turns = Math.max(existing.turns, turns);
-            existing.stacks = stacks;
-            existing.fixedValue = fixedValue;
-        } else {
-            owner.statuses.push({ id: statusId, turns, stacks, fixedValue, stackable: false });
+            if (stackable) {
+                existing.stacks = (existing.stacks || 1) + stacks;
+                existing.fixedValue = (existing.fixedValue || 0) + fixedValue;
+                existing.stackable = true;
+            } else {
+                existing.stacks = stacks;
+                existing.fixedValue = fixedValue;
+                existing.stackable = false;
+            }
+            return;
         }
+        owner.statuses.push({ id: statusId, turns, stacks, fixedValue, stackable });
     },
     decrementStatuses: (owner) => {
         if (!owner || !owner.statuses) return;
@@ -1271,7 +1274,12 @@ const Game = {
         } else if (s.id === 'm_a2') {
             const dmg = Math.max(1, Math.floor(int * (1.5 + lv * 0.5)));
             const actual = EnemyLogic.applyDamageToEnemy(target, dmg, true);
-            Utils.log(`${s.name}！ ${target.name}に ${actual} 魔法ダメージ！`);
+            if (actual > 0) {
+                Utils.applyStatus(target, 'freeze', 1);
+                Utils.log(`${s.name}！ ${target.name}に ${actual} 魔法ダメージ！ 凍結を付与！`);
+            } else {
+                Utils.log(`${s.name}！ ${target.name}に ${actual} 魔法ダメージ！`);
+            }
         } else if (s.id === 'm_s1') {
             State.combat.buffs.intUp = { turns: 3, mult: 1 + (0.2 + lv*0.1) };
             Utils.log(`${s.name}！ 3ターンINT上昇！`);
