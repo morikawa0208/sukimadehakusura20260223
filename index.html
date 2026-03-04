@@ -2005,8 +2005,9 @@ const Game = {
             diffHtml = Utils.getCompareHtml(drop, curr, statName);
             
             if (curr) {
+                Utils.ensureItemImprintSlots(curr);
                 const currValStr = curr.type === 'weapon' ? `${curr.minAtk}-${curr.maxAtk}` : curr.value;
-                compareHtml = `<div class="text-[10px] text-gray-500 mt-2 border-t pt-1 border-gray-200">現在装備: ${curr.name} (${statName}:${currValStr} / ${curr.bonusStat.toUpperCase()}:+${curr.bonusValue})</div>`;
+                compareHtml = `<div class="text-[10px] text-gray-500 mt-2 border-t pt-1 border-gray-200">現在装備: ${curr.name} (${statName}:${currValStr} / ${curr.bonusStat.toUpperCase()}:+${curr.bonusValue} / ソケット:${curr.imprintSlots.capacity})</div>`;
             } else {
                 compareHtml = `<div class="text-[10px] text-gray-500 mt-2 border-t pt-1 border-gray-200">現在装備: なし</div>`;
             }
@@ -2042,6 +2043,7 @@ const Game = {
                     <div class="text-sm flex justify-center items-center space-x-2">
                         <span>${statName}: ${itemValStr}</span>
                         <span>${drop.bonusStat.toUpperCase()}: +${drop.bonusValue}</span>
+                        <span>ソケット: ${drop.imprintSlots.capacity}</span>
                         <span>${diffHtml}</span>
                     </div>
                     ${compareHtml}
@@ -2380,7 +2382,7 @@ const Game = {
         if (item.imprintSlots.equippedImprintIds.includes(imprintId)) return;
         const used = Utils.getImprintUsedCapacity(item);
         if (used + imprint.cost > item.imprintSlots.capacity) {
-            Game.showAlertModal({ title: '装着できません', message: 'ソケット容量が不足しています。' });
+            alert('ソケット容量が不足しています。');
             return;
         }
         item.imprintSlots.equippedImprintIds.push(imprintId);
@@ -2450,12 +2452,15 @@ const Game = {
             const itemValStr = item.type === 'weapon' ? `${item.minAtk}-${item.maxAtk}` : item.value;
             const used = Utils.getImprintUsedCapacity(item);
             const imprints = (item.imprintSlots?.equippedImprintIds || []).map(id => p.inventory.imprints.find(im => im.id === id)).filter(Boolean);
+            const options = p.inventory.imprints.filter(im => !item.imprintSlots.equippedImprintIds.includes(im.id));
             return `
                 <div class="p-2 border rounded ${rData.bg} ${rData.border} text-xs relative pr-8">
                     <div class="font-bold ${rData.color} mb-1">${item.name} ${Utils.getWeaponDetailsHtml(item)}</div>
                     <div class="text-[10px] text-gray-600">${statName}:${itemValStr} / ${item.bonusStat.toUpperCase()}+${item.bonusValue}</div>
                     <div class="text-[10px] text-gray-600 mt-1">ソケット: ${used}/${item.imprintSlots.capacity}</div>
                     <div class="text-[10px] text-gray-500 mt-1">${imprints.length > 0 ? imprints.map(im => `R${im.rank}:${im.effectKey}`).join(' / ') : '刻印なし'}</div>
+                    <div class="mt-1 space-y-1 max-h-20 overflow-y-auto hide-scrollbar">${options.length > 0 ? options.map(im => `<button onclick="Game.equipImprint('${slotName}','${im.id}')" class="w-full text-left px-2 py-1 border rounded bg-white hover:bg-gray-50 text-[10px]">装着 R${im.rank} ${im.effectKey} (cost${im.cost})</button>`).join('') : '<div class="text-[10px] text-gray-400">装着候補なし</div>'}</div>
+                    <div class="mt-1">${imprints.map(im => `<button onclick="Game.removeImprint('${slotName}','${im.id}')" class="mr-1 mt-1 px-1 py-0.5 bg-red-50 text-red-700 border border-red-200 rounded text-[10px]">解除 R${im.rank}:${im.effectKey}</button>`).join('')}</div>
                     <button onclick="Game.unequip('${slotName}')" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-red-500"><i class="fa-solid fa-minus-circle"></i></button>
                 </div>
             `;
@@ -2480,7 +2485,6 @@ const Game = {
                 ${renderEquipSlot('armor', p.equip.armor, '防具')}
                 ${renderEquipSlot('accessory', p.equip.accessory, '装飾品')}
             </div>
-            <div class="mb-4 space-y-2">${renderImprintAttach('weapon')}${renderImprintAttach('armor')}${renderImprintAttach('accessory')}</div>
             <button onclick="Game.showImprintLab()" class="w-full mb-3 px-3 py-2 border border-indigo-300 bg-indigo-50 text-indigo-700 rounded text-xs font-bold"><i class="fa-solid fa-stamp mr-1"></i>刻印工房を開く</button>
             <h4 class="font-bold text-sm mb-2 text-gray-600 border-b pb-1">鞄の中身</h4>
             <div class="space-y-2 max-h-48 overflow-y-auto hide-scrollbar">
