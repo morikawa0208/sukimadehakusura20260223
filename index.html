@@ -2386,14 +2386,14 @@ const Game = {
             return;
         }
         item.imprintSlots.equippedImprintIds.push(imprintId);
-        Game.showInventory();
+        Game.showImprintLab();
     },
 
     removeImprint: (slotName, imprintId) => {
         const item = State.player.equip[slotName];
         if (!item || !item.imprintSlots) return;
         item.imprintSlots.equippedImprintIds = item.imprintSlots.equippedImprintIds.filter(id => id !== imprintId);
-        Game.showInventory();
+        Game.showImprintLab();
     },
 
     sellImprintsBySignature: (signature) => {
@@ -2453,6 +2453,19 @@ const Game = {
             return `<button onclick="Game.showImprintLab(${rank})" class="px-2 py-1 rounded text-[10px] border ${active ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300'}">${label}</button>`;
         }).join('');
 
+        const renderEquipManagement = (slotName, item, label) => {
+            if (!item) return `<div class="p-2 border border-dashed rounded text-[10px] text-gray-400">${label}: 装備なし</div>`;
+            Utils.ensureItemImprintSlots(item);
+            const used = Utils.getImprintUsedCapacity(item);
+            const equipped = (item.imprintSlots.equippedImprintIds || []).map(id => State.player.inventory.imprints.find(im => im.id === id)).filter(Boolean);
+            const candidates = State.player.inventory.imprints.filter(im => !item.imprintSlots.equippedImprintIds.includes(im.id));
+            return `<div class="p-2 border rounded bg-white text-[10px]">
+                <div class="font-bold mb-1">${label} ソケット ${used}/${item.imprintSlots.capacity}</div>
+                <div class="space-y-1 max-h-20 overflow-y-auto hide-scrollbar">${candidates.length > 0 ? candidates.map(im => `<button onclick="Game.equipImprint('${slotName}','${im.id}')" class="w-full text-left px-2 py-1 border rounded hover:bg-gray-50">装着 R${im.rank} ${im.effectKey} (cost${im.cost})</button>`).join('') : '<div class="text-gray-400">装着候補なし</div>'}</div>
+                <div class="mt-1">${equipped.length > 0 ? equipped.map(im => `<button onclick="Game.removeImprint('${slotName}','${im.id}')" class="mr-1 mt-1 px-1 py-0.5 bg-red-50 text-red-700 border border-red-200 rounded">解除 R${im.rank}:${im.effectKey}</button>`).join('') : '<span class="text-gray-400">装着中なし</span>'}</div>
+            </div>`;
+        };
+
         let html = `<h3 class="font-bold text-lg mb-3 border-b pb-2"><i class="fa-solid fa-stamp mr-2"></i>刻印工房（鑑定無料）</h3>
             <div class="space-y-2 mb-3">${renderStack('rough')}${renderStack('refined')}${renderStack('gleaming')}</div>
             <div class="flex gap-1 mb-3">
@@ -2464,6 +2477,10 @@ const Game = {
                 <div class="font-bold text-xs mb-1">合算結果（刻印のみ）</div>
                 ${effectRows || '<div class="text-[11px] text-gray-400">有効な刻印効果なし</div>'}
                 <div class="text-[11px] text-pink-700 mt-1">Rank6: 攻撃回数+1（同uniqueKeyは1回のみ適用）</div>
+            </div>
+            <div class="border rounded p-2 mb-3 bg-gray-50">
+                <div class="font-bold text-xs mb-1"><i class="fa-solid fa-link mr-1"></i>刻印装着（工房内）</div>
+                <div class="space-y-2">${renderEquipManagement('weapon', State.player.equip.weapon, '武器')}${renderEquipManagement('armor', State.player.equip.armor, '防具')}${renderEquipManagement('accessory', State.player.equip.accessory, '装飾品')}</div>
             </div>
             <div class="border rounded p-2 mb-2 bg-white">
                 <div class="flex items-center justify-between mb-2">
@@ -2513,15 +2530,12 @@ const Game = {
             const itemValStr = item.type === 'weapon' ? `${item.minAtk}-${item.maxAtk}` : item.value;
             const used = Utils.getImprintUsedCapacity(item);
             const imprints = (item.imprintSlots?.equippedImprintIds || []).map(id => p.inventory.imprints.find(im => im.id === id)).filter(Boolean);
-            const options = p.inventory.imprints.filter(im => !item.imprintSlots.equippedImprintIds.includes(im.id));
             return `
                 <div class="p-2 border rounded ${rData.bg} ${rData.border} text-xs relative pr-8">
                     <div class="font-bold ${rData.color} mb-1">${item.name} ${Utils.getWeaponDetailsHtml(item)}</div>
                     <div class="text-[10px] text-gray-600">${statName}:${itemValStr} / ${item.bonusStat.toUpperCase()}+${item.bonusValue}</div>
                     <div class="text-[10px] text-gray-600 mt-1">ソケット: ${used}/${item.imprintSlots.capacity}</div>
                     <div class="text-[10px] text-gray-500 mt-1">${imprints.length > 0 ? imprints.map(im => `R${im.rank}:${im.effectKey}`).join(' / ') : '刻印なし'}</div>
-                    <div class="mt-1 space-y-1 max-h-20 overflow-y-auto hide-scrollbar">${options.length > 0 ? options.map(im => `<button onclick="Game.equipImprint('${slotName}','${im.id}')" class="w-full text-left px-2 py-1 border rounded bg-white hover:bg-gray-50 text-[10px]">装着 R${im.rank} ${im.effectKey} (cost${im.cost})</button>`).join('') : '<div class="text-[10px] text-gray-400">装着候補なし</div>'}</div>
-                    <div class="mt-1">${imprints.map(im => `<button onclick="Game.removeImprint('${slotName}','${im.id}')" class="mr-1 mt-1 px-1 py-0.5 bg-red-50 text-red-700 border border-red-200 rounded text-[10px]">解除 R${im.rank}:${im.effectKey}</button>`).join('')}</div>
                     <button onclick="Game.unequip('${slotName}')" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-red-500"><i class="fa-solid fa-minus-circle"></i></button>
                 </div>
             `;
