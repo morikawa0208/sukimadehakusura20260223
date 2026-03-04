@@ -262,7 +262,9 @@ const State = {
         buffs: {},
         defendUsed: false
     },
-    merchantOptions: []
+    merchantOptions: [],
+    baseMerchantOptions: [],
+    baseMerchantRefreshAvailable: true
 };
 
 // ==========================================
@@ -965,6 +967,7 @@ const Game = {
     // --- Stage Select ---
     renderStageSelect: () => {
         State.inDungeon = false;
+        State.baseMerchantOptions = Game.generateBaseMerchantOptions();
         Game.updateHeader();
         
         let html = `
@@ -974,6 +977,10 @@ const Game = {
                     <h2 class="text-xl font-bold">White Spire</h2>
                     <p class="text-sm text-gray-500">挑戦するステージを選択</p>
                 </div>
+                <button onclick="Game.renderBaseMerchant()" class="w-full max-w-sm mx-auto mb-4 p-3 border border-yellow-300 rounded-lg shadow-sm bg-yellow-50 hover:bg-yellow-100 flex items-center justify-between text-yellow-700 transition-colors shrink-0">
+                    <div class="font-bold"><i class="fa-solid fa-store mr-2"></i>拠点商店</div>
+                    <div class="text-xs">入荷: ${State.baseMerchantOptions.length}件 <i class="fa-solid fa-arrow-right ml-1"></i></div>
+                </button>
                 <div class="flex-1 overflow-y-auto space-y-3 max-w-sm mx-auto w-full hide-scrollbar pb-8">
         `;
         
@@ -1123,6 +1130,108 @@ const Game = {
         ];
         
         Game.updateMerchantUI();
+    },
+
+    generateBaseMerchantOptions: () => {
+        const itemLevel = Math.max(1, State.player.level + State.maxUnlockedStage + 1);
+        return [
+            ItemGen.generate('weapon', itemLevel),
+            ItemGen.generate('armor', itemLevel),
+            ItemGen.generate('accessory', itemLevel),
+            { id: `pot_base_${Date.now()}`, name: '高品質回復薬', type: 'item', value: 50, price: 25, desc: 'HPを50回復' }
+        ];
+    },
+
+    renderBaseMerchant: () => {
+        if (!State.baseMerchantOptions || State.baseMerchantOptions.length === 0) {
+            State.baseMerchantOptions = Game.generateBaseMerchantOptions();
+        }
+        Game.updateBaseMerchantUI();
+    },
+
+    refreshBaseMerchant: () => {
+        if (!State.baseMerchantRefreshAvailable) return;
+        State.baseMerchantOptions = Game.generateBaseMerchantOptions();
+        State.baseMerchantRefreshAvailable = false;
+        Game.updateBaseMerchantUI();
+    },
+
+    updateBaseMerchantUI: () => {
+        let html = `
+            <div class="flex-1 flex flex-col p-4 bg-gray-50">
+                <div class="text-center mb-4 mt-2">
+                    <i class="fa-solid fa-store text-4xl text-yellow-600 mb-2"></i>
+                    <h2 class="text-xl font-bold">拠点商店</h2>
+                    <p class="text-sm text-gray-500">更新ボタンで品揃えを更新できます</p>
+                    <p class="text-sm text-gray-500 mt-1">所持金: <span class="text-yellow-600 font-bold">${State.player.gold} G</span></p>
+                    <button onclick="Game.refreshBaseMerchant()" class="mt-3 px-4 py-2 rounded text-sm font-bold ${State.baseMerchantRefreshAvailable ? 'bg-yellow-500 text-white hover:bg-yellow-600' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}" ${State.baseMerchantRefreshAvailable ? '' : 'disabled'}><i class="fa-solid fa-rotate-right mr-1"></i>商品を更新</button>
+                </div>
+                <div class="flex-1 overflow-y-auto space-y-2 mb-4 hide-scrollbar">
+        `;
+
+        State.baseMerchantOptions.forEach((item, idx) => {
+            if (!item) return;
+
+            let details = '';
+            let style = 'bg-gray-50 border-gray-300';
+            if (item.type !== 'item') {
+                const rData = RARITY[item.rarity];
+                style = `${rData.bg} ${rData.border} ${rData.color}`;
+                const statName = item.type === 'weapon' ? 'ATK' : (item.type === 'armor' ? 'DEF' : 'BONUS');
+                const itemValStr = item.type === 'weapon' ? `${item.minAtk}-${item.maxAtk}` : item.value;
+
+                let currStr = 'なし';
+                const curr = State.player.equip[item.type];
+                const diffHtml = Utils.getCompareHtml(item, curr, statName);
+
+                if (curr) {
+                    const currValStr = curr.type === 'weapon' ? `${curr.minAtk}-${curr.maxAtk}` : curr.value;
+                    currStr = `${curr.name} (${statName}:${currValStr} / ${curr.bonusStat.toUpperCase()}+${curr.bonusValue})`;
+                }
+
+                details = `
+                    <div class="text-xs">[${rData.name}] ${statName}:${itemValStr} / ${item.bonusStat.toUpperCase()}+${item.bonusValue} ${diffHtml}</div>
+                    <div class="text-[9px] text-gray-500 mt-0.5">現在: ${currStr}</div>
+                `;
+            } else {
+                details = `<div class="text-xs">${item.desc}</div>`;
+            }
+
+            const canBuy = State.player.gold >= item.price;
+            html += `
+                <div class="p-3 border rounded flex justify-between items-center ${style}">
+                    <div class="flex-1 pr-2">
+                        <div class="font-bold text-sm mb-1">${item.name} ${Utils.getWeaponDetailsHtml(item)}</div>
+                        ${details}
+                    </div>
+                    <button onclick="Game.buyBaseItem(${idx})" class="px-3 py-1 rounded text-sm font-bold shrink-0 ${canBuy ? 'bg-yellow-500 text-white hover:bg-yellow-600' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}" ${!canBuy ? 'disabled' : ''}>
+                        ${item.price} G
+                    </button>
+                </div>
+            `;
+        });
+
+        html += `
+                </div>
+                <button onclick="Game.renderStageSelect()" class="p-3 bg-gray-800 text-white rounded font-bold w-full shadow">ステージ選択へ戻る</button>
+            </div>
+        `;
+        document.getElementById('main-view').innerHTML = html;
+    },
+
+    buyBaseItem: (idx) => {
+        const item = State.baseMerchantOptions[idx];
+        if (item && State.player.gold >= item.price) {
+            State.player.gold -= item.price;
+            if (item.type === 'item') {
+                State.player.hp = Math.min(Utils.getMaxHp(), State.player.hp + item.value);
+            } else {
+                State.player.inventory.push(item);
+            }
+            State.baseMerchantOptions[idx] = null;
+            Game.updateHeader();
+            Game.updateBaseMerchantUI();
+        }
     },
 
     updateMerchantUI: () => {
@@ -1796,6 +1905,7 @@ const Game = {
 
     gameOver: () => {
         State.inDungeon = false;
+        State.baseMerchantRefreshAvailable = true;
         Game.updateHeader();
         const stageName = STAGES[State.stage - 1]?.name || '';
         let html = `
@@ -1813,6 +1923,7 @@ const Game = {
             State.maxUnlockedStage++;
         }
         State.inDungeon = false;
+        State.baseMerchantRefreshAvailable = true;
         Game.updateHeader();
         const stageName = STAGES[State.stage - 1]?.name || `ステージ ${State.stage}`;
         
