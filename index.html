@@ -1982,6 +1982,10 @@ const Game = {
         const itemLevel = State.floor + ((State.stage - 1) * 10);
         const drop = ItemGen.generate('random', itemLevel, dropRarity);
         const goldDrop = Utils.rand(10, 30) * State.floor;
+        const imprintCategoryPool = ['rough', 'refined', 'gleaming'];
+        const imprintDropCategory = isBoss ? imprintCategoryPool[Utils.rand(1, 2)] : imprintCategoryPool[Utils.rand(0, 1)];
+        const imprintDropCount = isBoss ? Utils.rand(2, 4) : 1;
+        State.player.inventory.sealedImprints[imprintDropCategory] = (State.player.inventory.sealedImprints[imprintDropCategory] || 0) + imprintDropCount;
         
         // 経験値計算
         const expGain = Utils.rand(10, 20) * State.floor + ((State.stage - 1) * 50);
@@ -2045,6 +2049,10 @@ const Game = {
                     <div class="flex-1 border rounded p-3 text-center">
                         <div class="text-gray-500 text-[10px] mb-1">獲得ゴールド</div>
                         <div class="font-bold text-yellow-600">${goldDrop} G</div>
+                    </div>
+                    <div class="flex-1 border rounded p-3 text-center">
+                        <div class="text-gray-500 text-[10px] mb-1">刻印ドロップ</div>
+                        <div class="font-bold text-indigo-600">${IMPRINT_CATEGORY[imprintDropCategory].name} +${imprintDropCount}</div>
                     </div>
                 </div>
 
@@ -2579,11 +2587,6 @@ const Game = {
 
         const identifyBarHtml = `<div class="border-t bg-white p-2 shrink-0 sticky bottom-0 z-10">
             <div class="grid grid-cols-3 gap-1">${renderStack('rough')}${renderStack('refined')}${renderStack('gleaming')}</div>
-            <div class="grid grid-cols-3 gap-1 mt-1">
-                <button onclick="Game.addSealedImprints('rough',10)" class="px-1 py-1 border rounded text-[10px] bg-yellow-50 text-yellow-700">デバッグ 荒削り+10</button>
-                <button onclick="Game.addSealedImprints('refined',10)" class="px-1 py-1 border rounded text-[10px] bg-yellow-50 text-yellow-700">デバッグ 精錬+10</button>
-                <button onclick="Game.addSealedImprints('gleaming',10)" class="px-1 py-1 border rounded text-[10px] bg-yellow-50 text-yellow-700">デバッグ 煌めく+10</button>
-            </div>
         </div>`;
 
         return { contentHtml: html, identifyBarHtml, detailModalHtml };
