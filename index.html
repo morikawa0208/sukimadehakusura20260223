@@ -160,55 +160,55 @@ const STAGES = [
 ];
 
 const BOSS_DEFINITIONS = {
-    1: { id: 'boss_stage_1', name: '翠牙狼王ヴェルド', icon: 'fa-paw', base: { hp: 140, str: 14, vit: 7 }, tags: ['forest'], pattern: ['b1_howl', 'b1_bind', 'b1_blessing'], skills: [
+    1: { id: 'boss_stage_1', name: '翠牙狼王ヴェルド', icon: 'fa-paw', base: { hp: 140, str: 14, vit: 7 }, tags: ['forest'], pattern: ['b1_howl', 'basic_attack', 'b1_bind', 'basic_defend', 'b1_blessing'], skills: [
         { id: 'b1_howl', name: '狩人の咆哮', type: 'buffSelf', turns: 2, atkMult: 1.35, icon: 'fa-bullhorn' },
         { id: 'b1_bind', name: '蔦縛り', type: 'statusAttack', damageMult: 1.1, statusId: 'seal', turns: 1, chance: 70, icon: 'fa-link' },
         { id: 'b1_blessing', name: '森の加護', type: 'heal', healRate: 0.14, icon: 'fa-leaf' }
     ] },
-    2: { id: 'boss_stage_2', name: '反響魔コーラルバット', icon: 'fa-bat', base: { hp: 150, str: 15, vit: 8 }, tags: ['cave'], pattern: ['b2_echo', 'b2_sonic', 'b2_night'], skills: [
+    2: { id: 'boss_stage_2', name: '反響魔コーラルバット', icon: 'fa-bat', base: { hp: 150, str: 15, vit: 8 }, tags: ['cave'], pattern: ['b2_echo', 'basic_attack', 'b2_sonic', 'basic_defend', 'b2_night'], skills: [
         { id: 'b2_echo', name: '反響咆哮', type: 'buffSelf', turns: 2, atkMult: 1.3, icon: 'fa-volume-high' },
         { id: 'b2_sonic', name: '超音波', type: 'statusAttack', damageMult: 1.0, statusId: 'attackCountDown', turns: 2, chance: 65, icon: 'fa-volume-xmark' },
         { id: 'b2_night', name: '闇夜の再生', type: 'heal', healRate: 0.14, icon: 'fa-moon' }
     ] },
-    3: { id: 'boss_stage_3', name: '廃都執行者ネメシス', icon: 'fa-skull', base: { hp: 165, str: 16, vit: 9 }, tags: ['ruins'], pattern: ['b3_justice', 'b3_chain', 'b3_ruin'], skills: [
+    3: { id: 'boss_stage_3', name: '廃都執行者ネメシス', icon: 'fa-skull', base: { hp: 165, str: 16, vit: 9 }, tags: ['ruins'], pattern: ['b3_justice', 'basic_attack', 'b3_chain', 'basic_defend', 'b3_ruin'], skills: [
         { id: 'b3_justice', name: '執行宣言', type: 'buffSelf', turns: 2, atkMult: 1.35, icon: 'fa-gavel' },
         { id: 'b3_chain', name: '断罪の鎖', type: 'statusAttack', damageMult: 1.15, statusId: 'seal', turns: 1, chance: 70, icon: 'fa-link' },
         { id: 'b3_ruin', name: '廃都の残響', type: 'heal', healRate: 0.15, icon: 'fa-city' }
     ] },
-    4: { id: 'boss_stage_4', name: '熔鉄竜イグニバルド', icon: 'fa-dragon', base: { hp: 180, str: 18, vit: 10 }, tags: ['fire'], pattern: ['b4_heat', 'b4_breath', 'b4_core'], skills: [
+    4: { id: 'boss_stage_4', name: '熔鉄竜イグニバルド', icon: 'fa-dragon', base: { hp: 180, str: 18, vit: 10 }, tags: ['fire'], pattern: ['b4_heat', 'basic_attack', 'b4_breath', 'basic_defend', 'b4_core'], skills: [
         { id: 'b4_heat', name: '灼熱鱗', type: 'buffSelf', turns: 2, atkMult: 1.4, icon: 'fa-fire-flame-curved' },
         { id: 'b4_breath', name: 'マグマブレス', type: 'statusAttack', damageMult: 1.2, statusId: 'defDown', turns: 2, chance: 65, icon: 'fa-fire' },
         { id: 'b4_core', name: '炉心再生', type: 'heal', healRate: 0.13, icon: 'fa-heart-circle-plus' }
     ] },
-    5: { id: 'boss_stage_5', name: '氷鏡の女王フリジア', icon: 'fa-snowflake', base: { hp: 190, str: 18, vit: 11 }, tags: ['ice'], pattern: ['b5_frost', 'b5_zero', 'b5_snow'], skills: [
+    5: { id: 'boss_stage_5', name: '氷鏡の女王フリジア', icon: 'fa-snowflake', base: { hp: 190, str: 18, vit: 11 }, tags: ['ice'], pattern: ['b5_frost', 'basic_attack', 'b5_zero', 'basic_defend', 'b5_snow'], skills: [
         { id: 'b5_frost', name: '氷鏡展開', type: 'buffSelf', turns: 2, atkMult: 1.3, icon: 'fa-icicles' },
         { id: 'b5_zero', name: '絶対零度', type: 'statusAttack', damageMult: 1.1, statusId: 'freeze', turns: 1, chance: 60, icon: 'fa-temperature-empty' },
         { id: 'b5_snow', name: '白霧治癒', type: 'heal', healRate: 0.14, icon: 'fa-cloud' }
     ] },
-    6: { id: 'boss_stage_6', name: '瘴王モルビドゥス', icon: 'fa-skull-crossbones', base: { hp: 205, str: 19, vit: 12 }, tags: ['miasma'], pattern: ['b6_miasma', 'b6_rot', 'b6_absorb'], skills: [
+    6: { id: 'boss_stage_6', name: '瘴王モルビドゥス', icon: 'fa-skull-crossbones', base: { hp: 205, str: 19, vit: 12 }, tags: ['miasma'], pattern: ['b6_miasma', 'basic_attack', 'b6_rot', 'basic_defend', 'b6_absorb'], skills: [
         { id: 'b6_miasma', name: '瘴気解放', type: 'buffSelf', turns: 2, atkMult: 1.35, icon: 'fa-smog' },
         { id: 'b6_rot', name: '腐蝕霧', type: 'statusAttack', damageMult: 1.0, statusId: 'poison', turns: 2, chance: 70, poisonDamage: 6, icon: 'fa-skull-crossbones' },
         { id: 'b6_absorb', name: '病魔吸収', type: 'heal', healRate: 0.15, icon: 'fa-droplet' }
     ] },
-    7: { id: 'boss_stage_7', name: '遺跡守護機オベリスク', icon: 'fa-monument', base: { hp: 220, str: 20, vit: 13 }, tags: ['ancient'], pattern: ['b7_overclock', 'b7_crush', 'b7_beam', 'b7_repair'], skills: [
+    7: { id: 'boss_stage_7', name: '遺跡守護機オベリスク', icon: 'fa-monument', base: { hp: 220, str: 20, vit: 13 }, tags: ['ancient'], pattern: ['b7_overclock', 'basic_attack', 'b7_crush', 'basic_defend', 'b7_beam', 'b7_repair'], skills: [
         { id: 'b7_overclock', name: '防衛モード', type: 'buffSelf', turns: 2, atkMult: 1.3, icon: 'fa-shield-halved' },
         { id: 'b7_crush', name: '遺跡圧砕', type: 'statusAttack', damageMult: 1.2, statusId: 'defDown', turns: 2, chance: 65, icon: 'fa-hammer' },
         { id: 'b7_beam', name: 'チャージビーム', type: 'powerAttack', damageMult: 1.8, icon: 'fa-bolt' },
         { id: 'b7_repair', name: '自己修復', type: 'heal', healRate: 0.14, icon: 'fa-screwdriver-wrench' }
     ] },
-    8: { id: 'boss_stage_8', name: '幻惑魔ミラージュ', icon: 'fa-masks-theater', base: { hp: 235, str: 21, vit: 14 }, tags: ['illusion'], pattern: ['b8_focus', 'b8_trick', 'b8_dreameater', 'b8_dream'], skills: [
+    8: { id: 'boss_stage_8', name: '幻惑魔ミラージュ', icon: 'fa-masks-theater', base: { hp: 235, str: 21, vit: 14 }, tags: ['illusion'], pattern: ['b8_focus', 'basic_attack', 'b8_trick', 'basic_defend', 'b8_dreameater', 'b8_dream'], skills: [
         { id: 'b8_focus', name: '幻影増幅', type: 'buffSelf', turns: 2, atkMult: 1.35, icon: 'fa-wand-magic-sparkles' },
         { id: 'b8_trick', name: '虚像誘導', type: 'statusAttack', damageMult: 1.1, statusId: 'atkDown', turns: 2, chance: 70, icon: 'fa-eye-slash' },
         { id: 'b8_dreameater', name: '夢喰い', type: 'powerAttack', damageMult: 1.75, icon: 'fa-moon' },
         { id: 'b8_dream', name: '夢喰い治癒', type: 'heal', healRate: 0.14, icon: 'fa-bed' }
     ] },
-    9: { id: 'boss_stage_9', name: '黒冠騎士アビスロード', icon: 'fa-chess-king', base: { hp: 250, str: 23, vit: 15 }, tags: ['dark'], pattern: ['b9_order', 'b9_mark', 'b9_judgement', 'b9_darkheal'], skills: [
+    9: { id: 'boss_stage_9', name: '黒冠騎士アビスロード', icon: 'fa-chess-king', base: { hp: 250, str: 23, vit: 15 }, tags: ['dark'], pattern: ['b9_order', 'basic_attack', 'b9_mark', 'basic_defend', 'b9_judgement', 'b9_darkheal'], skills: [
         { id: 'b9_order', name: '黒の号令', type: 'buffSelf', turns: 2, atkMult: 1.4, icon: 'fa-flag' },
         { id: 'b9_mark', name: '奈落の刻印', type: 'statusAttack', damageMult: 1.15, statusId: 'seal', turns: 1, chance: 75, icon: 'fa-stamp' },
         { id: 'b9_judgement', name: '断罪斬', type: 'powerAttack', damageMult: 1.85, icon: 'fa-khanda' },
         { id: 'b9_darkheal', name: '奈落の吸収', type: 'heal', healRate: 0.13, icon: 'fa-hand-holding-medical' }
     ] },
-    10: { id: 'boss_stage_10', name: '白尖の主ルミナス・ドラグーン', icon: 'fa-chess-rook', base: { hp: 280, str: 25, vit: 17 }, tags: ['spire'], pattern: ['b10_aura', 'b10_lance', 'b10_ray', 'b10_grace'], skills: [
+    10: { id: 'boss_stage_10', name: '白尖の主ルミナス・ドラグーン', icon: 'fa-chess-rook', base: { hp: 280, str: 25, vit: 17 }, tags: ['spire'], pattern: ['b10_aura', 'basic_attack', 'b10_lance', 'basic_defend', 'b10_ray', 'b10_grace'], skills: [
         { id: 'b10_aura', name: '純白領域', type: 'buffSelf', turns: 2, atkMult: 1.4, icon: 'fa-sun' },
         { id: 'b10_lance', name: '天穿つ槍', type: 'statusAttack', damageMult: 1.2, statusId: 'attackCountDown', turns: 2, chance: 70, icon: 'fa-crosshairs' },
         { id: 'b10_ray', name: '終焉の光条', type: 'powerAttack', damageMult: 1.9, icon: 'fa-burst' },
@@ -597,6 +597,13 @@ const EnemyLogic = {
         st.patternIndex++;
         const skill = EnemyLogic.getBossSkill(enemy, skillId);
         const baseMult = st.atkMultTurns > 0 ? st.atkMult : 1;
+
+        if (skillId === 'basic_attack') {
+            return { type: 'attack', value: Math.floor(enemy.str * baseMult), icon: 'fa-khanda', color: 'text-red-500', name: '通常攻撃', desc: '単体に物理ダメージを与える。' };
+        }
+        if (skillId === 'basic_defend') {
+            return { type: 'defend', value: enemy.vit * 2, icon: 'fa-shield', color: 'text-blue-500', name: '防御', desc: `ブロックを${enemy.vit * 2}獲得する。` };
+        }
 
         if (!skill) {
             return { type: 'attack', value: Math.floor(enemy.str * baseMult), icon: 'fa-khanda', color: 'text-red-500', name: '通常攻撃', desc: '単体に物理ダメージを与える。' };
