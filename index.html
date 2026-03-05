@@ -160,55 +160,55 @@ const STAGES = [
 ];
 
 const BOSS_DEFINITIONS = {
-    1: { id: 'boss_stage_1', name: '翠牙狼王ヴェルド', icon: 'fa-paw', base: { hp: 140, str: 14, vit: 7 }, tags: ['forest'], pattern: ['b1_howl', 'b1_bind', 'b1_blessing'], skills: [
+    1: { id: 'boss_stage_1', name: '翠牙狼王ヴェルド', icon: 'fa-paw', base: { hp: 140, str: 14, vit: 7 }, tags: ['forest'], pattern: ['b1_howl', 'basic_attack', 'b1_bind', 'basic_defend', 'b1_blessing'], skills: [
         { id: 'b1_howl', name: '狩人の咆哮', type: 'buffSelf', turns: 2, atkMult: 1.35, icon: 'fa-bullhorn' },
         { id: 'b1_bind', name: '蔦縛り', type: 'statusAttack', damageMult: 1.1, statusId: 'seal', turns: 1, chance: 70, icon: 'fa-link' },
         { id: 'b1_blessing', name: '森の加護', type: 'heal', healRate: 0.14, icon: 'fa-leaf' }
     ] },
-    2: { id: 'boss_stage_2', name: '反響魔コーラルバット', icon: 'fa-bat', base: { hp: 150, str: 15, vit: 8 }, tags: ['cave'], pattern: ['b2_echo', 'b2_sonic', 'b2_night'], skills: [
+    2: { id: 'boss_stage_2', name: '反響魔コーラルバット', icon: 'fa-bat', base: { hp: 150, str: 15, vit: 8 }, tags: ['cave'], pattern: ['b2_echo', 'basic_attack', 'b2_sonic', 'basic_defend', 'b2_night'], skills: [
         { id: 'b2_echo', name: '反響咆哮', type: 'buffSelf', turns: 2, atkMult: 1.3, icon: 'fa-volume-high' },
         { id: 'b2_sonic', name: '超音波', type: 'statusAttack', damageMult: 1.0, statusId: 'attackCountDown', turns: 2, chance: 65, icon: 'fa-volume-xmark' },
         { id: 'b2_night', name: '闇夜の再生', type: 'heal', healRate: 0.14, icon: 'fa-moon' }
     ] },
-    3: { id: 'boss_stage_3', name: '廃都執行者ネメシス', icon: 'fa-skull', base: { hp: 165, str: 16, vit: 9 }, tags: ['ruins'], pattern: ['b3_justice', 'b3_chain', 'b3_ruin'], skills: [
+    3: { id: 'boss_stage_3', name: '廃都執行者ネメシス', icon: 'fa-skull', base: { hp: 165, str: 16, vit: 9 }, tags: ['ruins'], pattern: ['b3_justice', 'basic_attack', 'b3_chain', 'basic_defend', 'b3_ruin'], skills: [
         { id: 'b3_justice', name: '執行宣言', type: 'buffSelf', turns: 2, atkMult: 1.35, icon: 'fa-gavel' },
         { id: 'b3_chain', name: '断罪の鎖', type: 'statusAttack', damageMult: 1.15, statusId: 'seal', turns: 1, chance: 70, icon: 'fa-link' },
         { id: 'b3_ruin', name: '廃都の残響', type: 'heal', healRate: 0.15, icon: 'fa-city' }
     ] },
-    4: { id: 'boss_stage_4', name: '熔鉄竜イグニバルド', icon: 'fa-dragon', base: { hp: 180, str: 18, vit: 10 }, tags: ['fire'], pattern: ['b4_heat', 'b4_breath', 'b4_core'], skills: [
+    4: { id: 'boss_stage_4', name: '熔鉄竜イグニバルド', icon: 'fa-dragon', base: { hp: 180, str: 18, vit: 10 }, tags: ['fire'], pattern: ['b4_heat', 'basic_attack', 'b4_breath', 'basic_defend', 'b4_core'], skills: [
         { id: 'b4_heat', name: '灼熱鱗', type: 'buffSelf', turns: 2, atkMult: 1.4, icon: 'fa-fire-flame-curved' },
         { id: 'b4_breath', name: 'マグマブレス', type: 'statusAttack', damageMult: 1.2, statusId: 'defDown', turns: 2, chance: 65, icon: 'fa-fire' },
         { id: 'b4_core', name: '炉心再生', type: 'heal', healRate: 0.13, icon: 'fa-heart-circle-plus' }
     ] },
-    5: { id: 'boss_stage_5', name: '氷鏡の女王フリジア', icon: 'fa-snowflake', base: { hp: 190, str: 18, vit: 11 }, tags: ['ice'], pattern: ['b5_frost', 'b5_zero', 'b5_snow'], skills: [
+    5: { id: 'boss_stage_5', name: '氷鏡の女王フリジア', icon: 'fa-snowflake', base: { hp: 190, str: 18, vit: 11 }, tags: ['ice'], pattern: ['b5_frost', 'basic_attack', 'b5_zero', 'basic_defend', 'b5_snow'], skills: [
         { id: 'b5_frost', name: '氷鏡展開', type: 'buffSelf', turns: 2, atkMult: 1.3, icon: 'fa-icicles' },
         { id: 'b5_zero', name: '絶対零度', type: 'statusAttack', damageMult: 1.1, statusId: 'freeze', turns: 1, chance: 60, icon: 'fa-temperature-empty' },
         { id: 'b5_snow', name: '白霧治癒', type: 'heal', healRate: 0.14, icon: 'fa-cloud' }
     ] },
-    6: { id: 'boss_stage_6', name: '瘴王モルビドゥス', icon: 'fa-skull-crossbones', base: { hp: 205, str: 19, vit: 12 }, tags: ['miasma'], pattern: ['b6_miasma', 'b6_rot', 'b6_absorb'], skills: [
+    6: { id: 'boss_stage_6', name: '瘴王モルビドゥス', icon: 'fa-skull-crossbones', base: { hp: 205, str: 19, vit: 12 }, tags: ['miasma'], pattern: ['b6_miasma', 'basic_attack', 'b6_rot', 'basic_defend', 'b6_absorb'], skills: [
         { id: 'b6_miasma', name: '瘴気解放', type: 'buffSelf', turns: 2, atkMult: 1.35, icon: 'fa-smog' },
         { id: 'b6_rot', name: '腐蝕霧', type: 'statusAttack', damageMult: 1.0, statusId: 'poison', turns: 2, chance: 70, poisonDamage: 6, icon: 'fa-skull-crossbones' },
         { id: 'b6_absorb', name: '病魔吸収', type: 'heal', healRate: 0.15, icon: 'fa-droplet' }
     ] },
-    7: { id: 'boss_stage_7', name: '遺跡守護機オベリスク', icon: 'fa-monument', base: { hp: 220, str: 20, vit: 13 }, tags: ['ancient'], pattern: ['b7_overclock', 'b7_crush', 'b7_beam', 'b7_repair'], skills: [
+    7: { id: 'boss_stage_7', name: '遺跡守護機オベリスク', icon: 'fa-monument', base: { hp: 220, str: 20, vit: 13 }, tags: ['ancient'], pattern: ['b7_overclock', 'basic_attack', 'b7_crush', 'basic_defend', 'b7_beam', 'b7_repair'], skills: [
         { id: 'b7_overclock', name: '防衛モード', type: 'buffSelf', turns: 2, atkMult: 1.3, icon: 'fa-shield-halved' },
         { id: 'b7_crush', name: '遺跡圧砕', type: 'statusAttack', damageMult: 1.2, statusId: 'defDown', turns: 2, chance: 65, icon: 'fa-hammer' },
         { id: 'b7_beam', name: 'チャージビーム', type: 'powerAttack', damageMult: 1.8, icon: 'fa-bolt' },
         { id: 'b7_repair', name: '自己修復', type: 'heal', healRate: 0.14, icon: 'fa-screwdriver-wrench' }
     ] },
-    8: { id: 'boss_stage_8', name: '幻惑魔ミラージュ', icon: 'fa-masks-theater', base: { hp: 235, str: 21, vit: 14 }, tags: ['illusion'], pattern: ['b8_focus', 'b8_trick', 'b8_dreameater', 'b8_dream'], skills: [
+    8: { id: 'boss_stage_8', name: '幻惑魔ミラージュ', icon: 'fa-masks-theater', base: { hp: 235, str: 21, vit: 14 }, tags: ['illusion'], pattern: ['b8_focus', 'basic_attack', 'b8_trick', 'basic_defend', 'b8_dreameater', 'b8_dream'], skills: [
         { id: 'b8_focus', name: '幻影増幅', type: 'buffSelf', turns: 2, atkMult: 1.35, icon: 'fa-wand-magic-sparkles' },
         { id: 'b8_trick', name: '虚像誘導', type: 'statusAttack', damageMult: 1.1, statusId: 'atkDown', turns: 2, chance: 70, icon: 'fa-eye-slash' },
         { id: 'b8_dreameater', name: '夢喰い', type: 'powerAttack', damageMult: 1.75, icon: 'fa-moon' },
         { id: 'b8_dream', name: '夢喰い治癒', type: 'heal', healRate: 0.14, icon: 'fa-bed' }
     ] },
-    9: { id: 'boss_stage_9', name: '黒冠騎士アビスロード', icon: 'fa-chess-king', base: { hp: 250, str: 23, vit: 15 }, tags: ['dark'], pattern: ['b9_order', 'b9_mark', 'b9_judgement', 'b9_darkheal'], skills: [
+    9: { id: 'boss_stage_9', name: '黒冠騎士アビスロード', icon: 'fa-chess-king', base: { hp: 250, str: 23, vit: 15 }, tags: ['dark'], pattern: ['b9_order', 'basic_attack', 'b9_mark', 'basic_defend', 'b9_judgement', 'b9_darkheal'], skills: [
         { id: 'b9_order', name: '黒の号令', type: 'buffSelf', turns: 2, atkMult: 1.4, icon: 'fa-flag' },
         { id: 'b9_mark', name: '奈落の刻印', type: 'statusAttack', damageMult: 1.15, statusId: 'seal', turns: 1, chance: 75, icon: 'fa-stamp' },
         { id: 'b9_judgement', name: '断罪斬', type: 'powerAttack', damageMult: 1.85, icon: 'fa-khanda' },
         { id: 'b9_darkheal', name: '奈落の吸収', type: 'heal', healRate: 0.13, icon: 'fa-hand-holding-medical' }
     ] },
-    10: { id: 'boss_stage_10', name: '白尖の主ルミナス・ドラグーン', icon: 'fa-chess-rook', base: { hp: 280, str: 25, vit: 17 }, tags: ['spire'], pattern: ['b10_aura', 'b10_lance', 'b10_ray', 'b10_grace'], skills: [
+    10: { id: 'boss_stage_10', name: '白尖の主ルミナス・ドラグーン', icon: 'fa-chess-rook', base: { hp: 280, str: 25, vit: 17 }, tags: ['spire'], pattern: ['b10_aura', 'basic_attack', 'b10_lance', 'basic_defend', 'b10_ray', 'b10_grace'], skills: [
         { id: 'b10_aura', name: '純白領域', type: 'buffSelf', turns: 2, atkMult: 1.4, icon: 'fa-sun' },
         { id: 'b10_lance', name: '天穿つ槍', type: 'statusAttack', damageMult: 1.2, statusId: 'attackCountDown', turns: 2, chance: 70, icon: 'fa-crosshairs' },
         { id: 'b10_ray', name: '終焉の光条', type: 'powerAttack', damageMult: 1.9, icon: 'fa-burst' },
@@ -728,6 +728,13 @@ const EnemyLogic = {
         st.patternIndex++;
         const skill = EnemyLogic.getBossSkill(enemy, skillId);
         const baseMult = st.atkMultTurns > 0 ? st.atkMult : 1;
+
+        if (skillId === 'basic_attack') {
+            return { type: 'attack', value: Math.floor(enemy.str * baseMult), icon: 'fa-khanda', color: 'text-red-500', name: '通常攻撃', desc: '単体に物理ダメージを与える。' };
+        }
+        if (skillId === 'basic_defend') {
+            return { type: 'defend', value: enemy.vit * 2, icon: 'fa-shield', color: 'text-blue-500', name: '防御', desc: `ブロックを${enemy.vit * 2}獲得する。` };
+        }
 
         if (!skill) {
             return { type: 'attack', value: Math.floor(enemy.str * baseMult), icon: 'fa-khanda', color: 'text-red-500', name: '通常攻撃', desc: '単体に物理ダメージを与える。' };
@@ -1857,12 +1864,12 @@ const Game = {
                 Utils.log(`${target.name}に ${actualDmg} のダメージ！`);
             }
 
-            // CP獲得処理
+            // CP獲得処理（武器タイプ依存）
             let cpGain = 0;
-            const jobName = State.player.job.name;
-            if (jobName === '戦士') cpGain = 3;
-            else if (jobName === '魔術師') cpGain = 5;
-            else if (jobName === '盗賊') cpGain = 2;
+            const weaponType = State.player.equip.weapon?.weaponType;
+            if (weaponType === 'sword') cpGain = 4;
+            else if (weaponType === 'dagger') cpGain = 2;
+            else if (weaponType === 'staff') cpGain = 7;
             
             State.player.cp = Math.min(Utils.getMaxCp(), State.player.cp + cpGain);
             Utils.showTextAnim('player-info-block', `+${cpGain}CP`, 'heal');
@@ -2001,8 +2008,9 @@ const Game = {
             diffHtml = Utils.getCompareHtml(drop, curr, statName);
             
             if (curr) {
+                Utils.ensureItemImprintSlots(curr);
                 const currValStr = curr.type === 'weapon' ? `${curr.minAtk}-${curr.maxAtk}` : curr.value;
-                compareHtml = `<div class="text-[10px] text-gray-500 mt-2 border-t pt-1 border-gray-200">現在装備: ${curr.name} (${statName}:${currValStr} / ${curr.bonusStat.toUpperCase()}:+${curr.bonusValue})</div>`;
+                compareHtml = `<div class="text-[10px] text-gray-500 mt-2 border-t pt-1 border-gray-200">現在装備: ${curr.name} (${statName}:${currValStr} / ${curr.bonusStat.toUpperCase()}:+${curr.bonusValue} / ソケット:${curr.imprintSlots.capacity})</div>`;
             } else {
                 compareHtml = `<div class="text-[10px] text-gray-500 mt-2 border-t pt-1 border-gray-200">現在装備: なし</div>`;
             }
@@ -2038,6 +2046,7 @@ const Game = {
                     <div class="text-sm flex justify-center items-center space-x-2">
                         <span>${statName}: ${itemValStr}</span>
                         <span>${drop.bonusStat.toUpperCase()}: +${drop.bonusValue}</span>
+                        <span>ソケット: ${drop.imprintSlots.capacity}</span>
                         <span>${diffHtml}</span>
                     </div>
                     ${compareHtml}
@@ -2380,7 +2389,7 @@ const Game = {
             return;
         }
         item.imprintSlots.equippedImprintIds.push(imprintId);
-        Game.showInventory();
+        Game.showImprintLab();
     },
 
     removeImprint: (slotName, imprintId) => {
@@ -2398,7 +2407,7 @@ const Game = {
         });
     },
 
-    showImprintLab: () => {
+    showImprintLab: (filterRank = 0) => {
         Utils.ensureInventoryStructure();
         const sealed = State.player.inventory.sealedImprints;
         const summary = Utils.getImprintEffectsSummary();
@@ -2415,6 +2424,40 @@ const Game = {
             </div>`;
         };
 
+        const equippedIds = new Set(Utils.getEquippedImprints().map(im => im.id));
+        const groupedMap = {};
+        State.player.inventory.imprints.forEach(im => {
+            const sig = `${im.category}|${im.rank}|${im.cost}|${im.effectKey}|${im.rankBonus}|${im.uniqueKey}`;
+            if (!groupedMap[sig]) {
+                groupedMap[sig] = { ...im, count: 0, freeCount: 0, signature: sig };
+            }
+            groupedMap[sig].count += 1;
+            if (!equippedIds.has(im.id)) groupedMap[sig].freeCount += 1;
+        });
+
+        const groupedList = Object.values(groupedMap)
+            .filter(g => (filterRank === 0 ? true : g.rank === filterRank))
+            .sort((a, b) => (b.rank - a.rank) || a.effectKey.localeCompare(b.effectKey) || b.rankBonus - a.rankBonus);
+
+        const rankFilterButtons = ['全て', '1', '2', '3', '4', '5', '6'].map(label => {
+            const rank = label === '全て' ? 0 : Number(label);
+            const active = rank === filterRank;
+            return `<button onclick="Game.showImprintLab(${rank})" class="px-2 py-1 rounded text-[10px] border ${active ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300'}">${label}</button>`;
+        }).join('');
+
+        const renderEquipManagement = (slotName, item, label) => {
+            if (!item) return `<div class="p-2 border border-dashed rounded text-[10px] text-gray-400">${label}: 装備なし</div>`;
+            Utils.ensureItemImprintSlots(item);
+            const used = Utils.getImprintUsedCapacity(item);
+            const equipped = (item.imprintSlots.equippedImprintIds || []).map(id => State.player.inventory.imprints.find(im => im.id === id)).filter(Boolean);
+            const candidates = State.player.inventory.imprints.filter(im => !item.imprintSlots.equippedImprintIds.includes(im.id));
+            return `<div class="p-2 border rounded bg-white text-[10px]">
+                <div class="font-bold mb-1">${label} ソケット ${used}/${item.imprintSlots.capacity}</div>
+                <div class="space-y-1 max-h-20 overflow-y-auto hide-scrollbar">${candidates.length > 0 ? candidates.map(im => `<button onclick="Game.equipImprint('${slotName}','${im.id}')" class="w-full text-left px-2 py-1 border rounded hover:bg-gray-50">装着 R${im.rank} ${im.effectKey} (cost${im.cost})</button>`).join('') : '<div class="text-gray-400">装着候補なし</div>'}</div>
+                <div class="mt-1">${equipped.length > 0 ? equipped.map(im => `<button onclick="Game.removeImprint('${slotName}','${im.id}')" class="mr-1 mt-1 px-1 py-0.5 bg-red-50 text-red-700 border border-red-200 rounded">解除 R${im.rank}:${im.effectKey}</button>`).join('') : '<span class="text-gray-400">装着中なし</span>'}</div>
+            </div>`;
+        };
+
         let html = `<h3 class="font-bold text-lg mb-3 border-b pb-2"><i class="fa-solid fa-stamp mr-2"></i>刻印工房（鑑定無料）</h3>
             <div class="space-y-2 mb-3">${renderStack('rough')}${renderStack('refined')}${renderStack('gleaming')}</div>
             <div class="flex gap-1 mb-3">
@@ -2427,21 +2470,46 @@ const Game = {
                 ${effectRows || '<div class="text-[11px] text-gray-400">有効な刻印効果なし</div>'}
                 <div class="text-[11px] text-pink-700 mt-1">Rank6: 攻撃回数+1（同uniqueKeyは1回のみ適用）</div>
             </div>
-            <div class="max-h-56 overflow-y-auto space-y-2 hide-scrollbar">`;
+            <div class="border rounded p-2 mb-3 bg-gray-50">
+                <div class="font-bold text-xs mb-1"><i class="fa-solid fa-link mr-1"></i>刻印装着（工房内）</div>
+                <div class="space-y-2">${renderEquipManagement('weapon', State.player.equip.weapon, '武器')}${renderEquipManagement('armor', State.player.equip.armor, '防具')}${renderEquipManagement('accessory', State.player.equip.accessory, '装飾品')}</div>
+            </div>
+            <div class="border rounded p-2 mb-2 bg-white">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="font-bold text-xs"><i class="fa-solid fa-warehouse mr-1"></i>刻印倉庫（ランク順）</div>
+                    <div class="text-[10px] text-gray-500">所持 ${State.player.inventory.imprints.length} 個</div>
+                </div>
+                <div class="flex flex-wrap gap-1 mb-2">${rankFilterButtons}</div>
+                <div class="max-h-56 overflow-y-auto space-y-2 hide-scrollbar">`;
 
-        State.player.inventory.imprints.forEach(im => {
-            const cls = Utils.getImprintRankColor(im.rank);
-            const bonusText = im.rank === 6 ? '-' : im.rankBonus.toFixed(1);
-            html += `<div class="p-2 border rounded text-xs ${cls}">
-                <div class="font-bold">${IMPRINT_CATEGORY[im.category].name} Rank${im.rank} / cost${im.cost}</div>
-                <div>effect:${im.effectKey} / bonus:${bonusText}</div>
-            </div>`;
-        });
-        html += `</div><button onclick="Game.closeModal()" class="mt-3 px-3 py-2 bg-gray-800 text-white rounded text-sm w-full">閉じる</button>`;
+        if (groupedList.length === 0) {
+            html += `<div class="text-center text-gray-400 text-xs py-4">条件に合う刻印がありません</div>`;
+        } else {
+            groupedList.forEach(im => {
+                const cls = Utils.getImprintRankColor(im.rank);
+                const bonusText = im.rank === 6 ? '-' : im.rankBonus.toFixed(1);
+                const unitPrice = Math.max(1, im.rank * 4 + im.cost * 3);
+                html += `<div class="p-2 border rounded text-xs ${cls}">
+                    <div class="flex justify-between items-start gap-2">
+                        <div>
+                            <div class="font-bold">${IMPRINT_CATEGORY[im.category].name} Rank${im.rank} / cost${im.cost} ×${im.count}</div>
+                            <div>effect:${im.effectKey} / bonus:${bonusText}</div>
+                            <div class="text-[10px] text-gray-600">売却可能 ${im.freeCount} 個（装着中 ${im.count - im.freeCount} 個）</div>
+                        </div>
+                        <button onclick="Game.sellImprintsBySignature('${im.signature}')" class="px-2 py-1 bg-yellow-100 text-yellow-800 border border-yellow-300 rounded text-[10px] font-bold" ${im.freeCount < 1 ? 'disabled' : ''}>
+                            売却 ${unitPrice * im.freeCount}G
+                        </button>
+                    </div>
+                </div>`;
+            });
+        }
+
+        html += `</div></div><button onclick="Game.closeModal()" class="mt-3 px-3 py-2 bg-gray-800 text-white rounded text-sm w-full">閉じる</button>`;
         Game.showModal(html);
     },
 
     showInventory: () => {
+
         Utils.ensureInventoryStructure();
         const p = State.player;
         const gearBag = p.inventory.equipment;
@@ -2484,7 +2552,6 @@ const Game = {
                 ${renderEquipSlot('armor', p.equip.armor, '防具')}
                 ${renderEquipSlot('accessory', p.equip.accessory, '装飾品')}
             </div>
-            <div class="mb-4 space-y-2">${renderImprintAttach('weapon')}${renderImprintAttach('armor')}${renderImprintAttach('accessory')}</div>
             <button onclick="Game.showImprintLab()" class="w-full mb-3 px-3 py-2 border border-indigo-300 bg-indigo-50 text-indigo-700 rounded text-xs font-bold"><i class="fa-solid fa-stamp mr-1"></i>刻印工房を開く</button>
             <h4 class="font-bold text-sm mb-2 text-gray-600 border-b pb-1">鞄の中身</h4>
             <div class="space-y-2 max-h-48 overflow-y-auto hide-scrollbar">
@@ -2566,3 +2633,6 @@ window.onload = Game.init;
 </script>
 </body>
 </html>
+
+
+
