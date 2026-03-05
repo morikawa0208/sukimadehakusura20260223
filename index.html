@@ -2440,6 +2440,11 @@ const Game = {
             maxHp: '最大HPの刻印', maxCp: '最大CPの刻印', atkPercent: '攻撃力の刻印', defPercent: '防御力の刻印', attackCountPlusOne: '攻撃回数の刻印'
         };
         const slotLabelMap = { weapon: '武器', armor: '防具', accessory: '装飾品' };
+        const filterKeys = [...IMPRINT_EFFECT_KEYS, 'attackCountPlusOne'];
+        State.inventoryImprintEffectFilter ||= {};
+        filterKeys.forEach(k => {
+            if (typeof State.inventoryImprintEffectFilter[k] !== 'boolean') State.inventoryImprintEffectFilter[k] = true;
+        });
         const slotRows = ['weapon', 'armor', 'accessory'].map(slot => {
             const item = State.player.equip[slot];
             if (!item) return `<div class="text-[11px] text-gray-500 px-2 py-1 bg-white border rounded">${slotLabelMap[slot]}: 装備なし</div>`;
@@ -2504,6 +2509,7 @@ const Game = {
 
         const groupedList = Object.values(groupedMap)
             .filter(g => (filterRank === 0 ? true : g.rank === filterRank))
+            .filter(g => State.inventoryImprintEffectFilter[g.effectKey] !== false)
             .sort((a, b) => {
                 const av = a.rank === 6 ? 999 : ((a.rank + a.rankBonus) * (IMPRINT_COST_WEIGHT[a.cost] || 1));
                 const bv = b.rank === 6 ? 999 : ((b.rank + b.rankBonus) * (IMPRINT_COST_WEIGHT[b.cost] || 1));
@@ -2530,8 +2536,11 @@ const Game = {
                     <div class="font-bold text-xs"><i class="fa-solid fa-warehouse mr-1"></i>刻印倉庫（値順）</div>
                     <div class="text-[10px] text-gray-500">所持 ${State.player.inventory.imprints.length} 個</div>
                 </div>
-                <div class="flex flex-wrap gap-1 mb-2">${rankFilterButtons}</div>
-                <div class="space-y-2">`;
+                <div class="flex items-center gap-1 mb-2">
+                    <div class="flex flex-wrap gap-1 flex-1">${rankFilterButtons}</div>
+                    <button onclick="Game.showImprintEffectFilterModal()" class="px-2 py-1 rounded text-[10px] border bg-white text-gray-700 border-gray-300"><i class="fa-solid fa-filter mr-1"></i>絞込</button>
+                </div>
+                <div class="space-y-2 max-h-[34vh] overflow-y-auto hide-scrollbar">`;
 
         if (groupedList.length === 0) {
             html += `<div class="text-center text-gray-400 text-xs py-4">条件に合う刻印がありません</div>`;
@@ -2568,7 +2577,7 @@ const Game = {
             <div class="space-y-2">${detailRows || '<div class="text-[11px] text-gray-400">有効な刻印効果なし</div>'}</div>
             <button onclick="Game.closeModal()" class="mt-3 px-3 py-2 bg-gray-800 text-white rounded text-sm w-full">閉じる</button>`;
 
-        const identifyBarHtml = `<div class="border-t bg-white p-2 shrink-0">
+        const identifyBarHtml = `<div class="border-t bg-white p-2 shrink-0 sticky bottom-0 z-10">
             <div class="grid grid-cols-3 gap-1">${renderStack('rough')}${renderStack('refined')}${renderStack('gleaming')}</div>
             <div class="grid grid-cols-3 gap-1 mt-1">
                 <button onclick="Game.addSealedImprints('rough',10)" class="px-1 py-1 border rounded text-[10px] bg-yellow-50 text-yellow-700">デバッグ 荒削り+10</button>
@@ -2583,6 +2592,45 @@ const Game = {
     showImprintSummaryDetail: () => {
         const imprintView = Game.renderImprintLabContent(State.inventoryImprintFilterRank || 0);
         Game.showModal(imprintView.detailModalHtml);
+    },
+
+    showImprintEffectFilterModal: () => {
+        const labelMap = {
+            str: 'STRの刻印', vit: 'VITの刻印', dex: 'DEXの刻印', int: 'INTの刻印', luk: 'LUKの刻印',
+            maxHp: '最大HPの刻印', maxCp: '最大CPの刻印', atkPercent: '攻撃力の刻印', defPercent: '防御力の刻印', attackCountPlusOne: '攻撃回数の刻印'
+        };
+        const keys = [...IMPRINT_EFFECT_KEYS, 'attackCountPlusOne'];
+        State.inventoryImprintEffectFilter ||= {};
+        keys.forEach(k => {
+            if (typeof State.inventoryImprintEffectFilter[k] !== 'boolean') State.inventoryImprintEffectFilter[k] = true;
+        });
+        const rows = keys.map(k => `<label class="flex items-center gap-2 text-sm"><input type="checkbox" ${State.inventoryImprintEffectFilter[k] ? 'checked' : ''} onchange="Game.toggleImprintEffectFilter('${k}')">${labelMap[k] || k}</label>`).join('');
+        const html = `<h3 class="font-bold text-lg mb-3 border-b pb-2"><i class="fa-solid fa-filter mr-2"></i>刻印効果の絞込</h3>
+            <div class="space-y-2 mb-3">${rows}</div>
+            <div class="grid grid-cols-2 gap-2 mb-3">
+                <button onclick="Game.setImprintEffectFilterAll(true)" class="px-3 py-2 border rounded bg-blue-50 text-blue-700 text-sm">全入れ</button>
+                <button onclick="Game.setImprintEffectFilterAll(false)" class="px-3 py-2 border rounded bg-gray-50 text-gray-700 text-sm">全消し</button>
+            </div>
+            <button onclick="Game.applyImprintEffectFilter()" class="px-3 py-2 bg-blue-600 text-white rounded text-sm w-full">適用</button>`;
+        Game.showModal(html);
+    },
+
+    toggleImprintEffectFilter: (key) => {
+        State.inventoryImprintEffectFilter ||= {};
+        State.inventoryImprintEffectFilter[key] = !State.inventoryImprintEffectFilter[key];
+        Game.showImprintEffectFilterModal();
+    },
+
+    setImprintEffectFilterAll: (value) => {
+        const keys = [...IMPRINT_EFFECT_KEYS, 'attackCountPlusOne'];
+        State.inventoryImprintEffectFilter ||= {};
+        keys.forEach(k => { State.inventoryImprintEffectFilter[k] = value; });
+        Game.showImprintEffectFilterModal();
+    },
+
+    applyImprintEffectFilter: () => {
+        Game.closeModal();
+        Game.showImprintLab(State.inventoryImprintFilterRank || 0);
     },
 
     showImprintLab: (filterRank = 0) => {
