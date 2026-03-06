@@ -2609,8 +2609,26 @@ const Game = {
     },
 
     showLogs: () => {
+        const savedAt1 = SaveService.getLastSavedAt(1);
+        const savedAt2 = SaveService.getLastSavedAt(2);
+        const savedAt1Label = savedAt1 ? new Date(savedAt1).toLocaleString('ja-JP') : '未保存';
+        const savedAt2Label = savedAt2 ? new Date(savedAt2).toLocaleString('ja-JP') : '未保存';
         let html = `
             <h3 class="font-bold text-lg mb-4 border-b pb-2"><i class="fa-solid fa-file-lines mr-2"></i>冒険の記録</h3>
+            <div class="mb-3 p-3 bg-blue-50 border border-blue-200 rounded text-xs text-blue-800">
+                <div class="font-bold mb-2"><i class="fa-solid fa-floppy-disk mr-1"></i>セーブ管理</div>
+                <div class="mb-1">スロット1最終保存: ${savedAt1Label}</div>
+                <div class="mb-2">スロット2最終保存: ${savedAt2Label}</div>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="Game.manualSave(1)" class="px-3 py-2 bg-blue-600 text-white rounded font-bold text-xs hover:bg-blue-700"><i class="fa-solid fa-floppy-disk mr-1"></i>手動セーブ1</button>
+                    <button onclick="Game.manualSave(2)" class="px-3 py-2 bg-blue-600 text-white rounded font-bold text-xs hover:bg-blue-700"><i class="fa-solid fa-floppy-disk mr-1"></i>手動セーブ2</button>
+                    <button onclick="Game.exportSaveData()" class="px-3 py-2 bg-emerald-600 text-white rounded font-bold text-xs hover:bg-emerald-700"><i class="fa-solid fa-file-export mr-1"></i>書き出し</button>
+                    <label class="px-3 py-2 bg-amber-500 text-white rounded font-bold text-xs hover:bg-amber-600 text-center cursor-pointer"><i class="fa-solid fa-file-import mr-1"></i>読み込み
+                        <input id="save-import-input" type="file" accept="application/json" class="hidden" onchange="Game.importSaveData(event)">
+                    </label>
+                    <button onclick="Game.resetSaveData()" class="px-3 py-2 bg-red-600 text-white rounded font-bold text-xs hover:bg-red-700"><i class="fa-solid fa-trash mr-1"></i>初期化</button>
+                </div>
+            </div>
             <div class="space-y-1 text-xs max-h-[60vh] overflow-y-auto p-2 bg-gray-50 border rounded hide-scrollbar" id="full-log-container">
                 ${State.fullLogs.length > 0 ? State.fullLogs.map(l => `<div class="border-b border-gray-200 pb-1 mb-1">${l}</div>`).join('') : '<div class="text-gray-400 text-center py-4">まだ記録がありません</div>'}
             </div>
