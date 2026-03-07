@@ -2276,7 +2276,8 @@ const Game = {
             `<h2 class="text-2xl font-bold mb-6 text-yellow-500"><i class="fa-solid fa-trophy"></i> 戦闘勝利！</h2>`;
         
         const sellPrice = Math.max(1, Math.floor(drop.price / 2));
-        const canSwapEquip = drop.type !== 'item' && !!State.player.equip[drop.type];
+        const canEquipLoot = drop.type !== 'item';
+        const canSwapEquip = canEquipLoot && !!State.player.equip[drop.type];
 
         let html = `
             <div class="flex-1 flex flex-col items-center p-6 bg-white overflow-y-auto">
@@ -2315,7 +2316,7 @@ const Game = {
                 <div class="w-full flex space-x-3 mt-8">
                     <button onclick="Game.takeLoot(${JSON.stringify(drop).replace(/"/g, '&quot;')}, 'sell')" class="flex-1 py-3 border border-gray-300 rounded font-bold text-gray-600 hover:bg-gray-50">売却(${sellPrice}G)</button>
                     <button onclick="Game.takeLoot(${JSON.stringify(drop).replace(/"/g, '&quot;')}, 'take')" class="flex-1 py-3 bg-blue-600 text-white rounded font-bold shadow hover:bg-blue-700">拾う</button>
-                    ${canSwapEquip ? `<button onclick="Game.takeLoot(${JSON.stringify(drop).replace(/"/g, '&quot;')}, 'swap')" class="flex-1 py-3 bg-emerald-600 text-white rounded font-bold shadow hover:bg-emerald-700"><i class="fa-solid fa-right-left mr-1"></i>入れ替え</button>` : ''}
+                    ${canEquipLoot ? `<button onclick="Game.takeLoot(${JSON.stringify(drop).replace(/"/g, '&quot;')}, '${canSwapEquip ? 'swap' : 'equip'}')" class="flex-1 py-3 bg-emerald-600 text-white rounded font-bold shadow hover:bg-emerald-700"><i class="fa-solid ${canSwapEquip ? 'fa-right-left' : 'fa-hand-sparkles'} mr-1"></i>${canSwapEquip ? '入れ替え' : '装着'}</button>` : ''}
                 </div>
             </div>
         `;
@@ -2326,7 +2327,7 @@ const Game = {
         Utils.ensureInventoryStructure();
         if (action === 'take') {
             State.player.inventory.equipment.push(itemObj);
-        } else if (action === 'swap' && itemObj.type !== 'item') {
+        } else if ((action === 'swap' || action === 'equip') && itemObj.type !== 'item') {
             const slot = itemObj.type;
             const currentEquip = State.player.equip[slot];
             if (currentEquip) {
