@@ -854,7 +854,7 @@ const EnemyLogic = {
         const pattern = (enemy.pattern && enemy.pattern.length > 0) ? enemy.pattern : (enemy.skills || []).map(sk => sk.id);
         if (!pattern || pattern.length === 0) {
             const baseMult = st.atkMultTurns > 0 ? st.atkMult : 1;
-            return { type: 'attack', value: Math.floor(enemy.str * baseMult), icon: 'fa-khanda', color: 'text-red-500', name: '通常攻撃', desc: '単体に物理ダメージを与える。' };
+            return { type: 'attack', value: Math.floor(enemy.str * baseMult), icon: 'fa-khanda', color: 'text-red-500', name: '通常攻撃', desc: `予測ダメージ: ${Math.floor(enemy.str * baseMult)}` };
         }
 
         const patternPos = st.patternIndex % pattern.length;
@@ -864,14 +864,14 @@ const EnemyLogic = {
         const baseMult = st.atkMultTurns > 0 ? st.atkMult : 1;
 
         if (skillId === 'basic_attack') {
-            return { type: 'attack', value: Math.floor(enemy.str * baseMult), icon: 'fa-khanda', color: 'text-red-500', name: '通常攻撃', desc: '単体に物理ダメージを与える。' };
+            return { type: 'attack', value: Math.floor(enemy.str * baseMult), icon: 'fa-khanda', color: 'text-red-500', name: '通常攻撃', desc: `予測ダメージ: ${Math.floor(enemy.str * baseMult)}` };
         }
         if (skillId === 'basic_defend') {
             return { type: 'defend', value: enemy.vit * 2, icon: 'fa-shield', color: 'text-blue-500', name: '防御', desc: `ブロックを${enemy.vit * 2}獲得する。` };
         }
 
         if (!skill) {
-            return { type: 'attack', value: Math.floor(enemy.str * baseMult), icon: 'fa-khanda', color: 'text-red-500', name: '通常攻撃', desc: '単体に物理ダメージを与える。' };
+            return { type: 'attack', value: Math.floor(enemy.str * baseMult), icon: 'fa-khanda', color: 'text-red-500', name: '通常攻撃', desc: `予測ダメージ: ${Math.floor(enemy.str * baseMult)}` };
         }
 
         if (skill.type === 'buffSelf') {
@@ -898,7 +898,7 @@ const EnemyLogic = {
                 icon: skill.icon,
                 color: 'text-lime-700',
                 name: skill.name,
-                desc: `ATKx${skill.damageMult.toFixed(2)}ダメージ＋${skill.statusId}を${skill.chance}%で${skill.turns}ターン付与`
+                desc: `予測ダメージ: ${Math.floor(enemy.str * skill.damageMult * baseMult)} / ${skill.statusId}を${skill.chance}%で${skill.turns}ターン付与`
             };
         }
         if (skill.type === 'powerAttack') {
@@ -909,7 +909,7 @@ const EnemyLogic = {
                 icon: skill.icon,
                 color: 'text-red-700',
                 name: skill.name,
-                desc: `ATKx${skill.damageMult.toFixed(2)}の強力な攻撃`
+                desc: `予測ダメージ: ${Math.floor(enemy.str * skill.damageMult * baseMult)} の強力な攻撃`
             };
         }
         if (skill.type === 'heal') {
@@ -924,7 +924,7 @@ const EnemyLogic = {
             };
         }
 
-        return { type: 'attack', value: Math.floor(enemy.str * baseMult), icon: 'fa-khanda', color: 'text-red-500', name: '通常攻撃', desc: '単体に物理ダメージを与える。' };
+        return { type: 'attack', value: Math.floor(enemy.str * baseMult), icon: 'fa-khanda', color: 'text-red-500', name: '通常攻撃', desc: `予測ダメージ: ${Math.floor(enemy.str * baseMult)}` };
     },
     decideIntent: (enemy) => {
         if (enemy.bossId && enemy.bossId.startsWith('boss_stage_') && enemy.skills && enemy.skills.length > 0) {
