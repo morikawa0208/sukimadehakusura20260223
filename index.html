@@ -1707,7 +1707,7 @@ const Game = {
             
             let intentHtml = '';
             if (enemy.intent) {
-                const intentName = enemy.intent.name || (enemy.intent.type === 'attack' ? '通常攻撃' : '行動');
+                const intentName = enemy.intent.name || (enemy.intent.type === 'attack' ? '通常攻撃' : 'ブロック');
                 const intentDesc = enemy.intent.desc || (enemy.intent.value > 0 ? `予測ダメージ: ${enemy.intent.value}` : '行動情報なし');
                 const specialIntentTypes = ['buffSelf', 'statusAttack', 'powerAttack', 'heal'];
                 const isSpecialIntent = specialIntentTypes.includes(enemy.intent.type);
